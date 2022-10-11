@@ -154,8 +154,8 @@ def menu():
         a = input("userID > ")
         if a == 'quit' or a == '종료' or a == 'q' or a == 'ㅈㄹ' or a == 'exit' or a == '나가기':
             print('====== 미니 마블 게임을 종료합니다 ======')
-            print()
-            return
+            time.sleep(3)
+            return 0
         elif a == 'register' or a == '회원가입' or a == 'regi' or a == '가입' or a == 'r' or a == 'ㄱㅇ':
             register()
         elif a == 'login' or a == '로그인' or a == 'log' or a == '로긴' or a == 'l' or a == 'ㄹㄱㅇ':
@@ -461,7 +461,8 @@ def player_order(left_time, require_msg):
 
 
 def main():
-   menu()
+   if menu() == 0:
+       return
    #회원가입/로그인
    
    #인원
