@@ -143,8 +143,8 @@ islandPlayer = [0,0,0,0]
 global at_island
 at_island = 0
 global is_double
-
 is_double = 0
+
 
 
 
@@ -504,7 +504,6 @@ def input_timer(left_time, require_msg):
         elif player_input[0] != None:
             if require_msg == 'roll':
                 print('[Error]: 주사위 굴리기 명령어를 입력해주십시오')
-
                 player_input=[None]
 
             elif require_msg == 'festival':
@@ -512,7 +511,6 @@ def input_timer(left_time, require_msg):
                 if city_num != False:
                     print('===== ' + default_map_name[city_num] + ' 도시에서 축제를 시작합니다! =====')
                     now_festival = city_num
-
             else:
                 print('입력이 틀렸습니다.')
                 player_input=[None]
@@ -550,7 +548,6 @@ def input_timer(left_time, require_msg):
         time.sleep(2)
         return False
 
-    
     # 
     def warning():
         global id_info_list
@@ -595,7 +592,6 @@ def input_timer(left_time, require_msg):
                 if landmark_list[i] == now_order:
                     landmark_list[i] = 0
             print('====== 경고 2회 누적으로 파산되었습니다 =======')
-
 
 # ============================================================================================================
 # 
@@ -840,7 +836,6 @@ def island():
 
 
 # 축제 함수
-
 def festival():
     # 보유중인 도시 없으면 넘어가는걸
     global owner_list
@@ -852,12 +847,11 @@ def festival():
     if own_any_city == 0:
         print('아무 도시도 보유하고 있지 않습니다 ㅠ')
         return
-
-
     while True:
         print('>> festival?')
         if input_timer(15,'festival'):
             return
+
 
 def trip():
     while True:        
@@ -900,10 +894,19 @@ def action(landing_num):
         festival()
     elif landing_num == 15: # 공항
         print('공항')
-
     else:
          print('도시')
         
+
+def island():
+    global now_order
+    global islandPlayer
+    global is_double
+    islandPlayer[now_order] = 1
+    if is_double == 3:
+        player_end_location[now_order] = 5
+        player_start_location[now_order] = 5
+        # 활동로그파일 기록
 
 
 def player_move(Dice):
@@ -939,9 +942,8 @@ def custom_rollDice():
         if input_timer(10,'roll'):
             firstDice = int(input('첫 주사위 :')) #첫번째 주사위
             secondDice = int(input('두번째 주사위 :')) #두번째 주사위
-            totalDice = firstDice + secondDice #주사위들의 합
-            
-            if player_end_location[now_order] == 5:
+            totalDice = firstDice + secondDice #주사위들의 합         
+            if islandPlayer[now_order] == 1:
                 print('===== 첫번째 주사위 값: ' + str(firstDice) + ', 두번째 주사위 값: ' + str(secondDice) + ' =====')
                 print('===== 현재 무인도에 있습니다. 이동하지 않습니다. =====')
                 islandPlayer[now_order] = 0
@@ -970,12 +972,13 @@ def custom_rollDice():
                     print('===== 세번째 더블! =====')
                     print('===== 무인도로 이동합니다 =====')
                     island()
+                    player_move(0)
                     is_double = 0
                     return -1
         else:
             break
-
-    
+            
+            
 #주사위 굴리기 함수, 두개의 주사위 합이 리턴된다, 3번째 더블 나올 시에 0이 리턴된다.
 def rollDice(): 
     firstDice = 0
@@ -990,9 +993,7 @@ def rollDice():
             firstDice = random.randrange(1,7) #첫번째 주사위
             secondDice = random.randrange(1,7) #두번째 주사위
             totalDice = firstDice + secondDice #주사위들의 합
-
             if player_end_location[now_order] == 5:
-
                 print('===== 첫번째 주사위 값: ' + str(firstDice) + ', 두번째 주사위 값: ' + str(secondDice) + ' =====')
                 print('===== 현재 무인도에 있습니다. 이동하지 않습니다. =====')
                 islandPlayer[now_order] = 0
@@ -1001,15 +1002,12 @@ def rollDice():
             if firstDice != secondDice:
                 print('===== 첫번째 주사위 값: ' + str(firstDice) + ', 두번째 주사위 값: '+ str(secondDice) + ' =====')
                 print('===== ' + str(totalDice) + '칸 이동합니다. =====')
-
                 player_move(totalDice)
                 is_double = 0
-
                 return True
             else:
                 print('===== 첫번째 주사위 값: ' + str(firstDice) + ', 두번째 주사위 값: '+ str(secondDice) + ' =====')
                 is_double += 1
-
                 if is_double == 1:
                     print('===== 첫번째 더블! =====')
                     print('===== ' + str(totalDice) + '칸 이동합니다. =====')
@@ -1024,6 +1022,7 @@ def rollDice():
                     print('===== 세번째 더블! =====')
                     print('===== 무인도로 이동합니다 =====')
                     island()
+                    player_move(0)
                     is_double = 0
                     return -1
         else:
@@ -1053,15 +1052,11 @@ def main():
                 draw_basic_map()
                 custom_rollDice()
                 
-
-
-
-
+                
+                
                 #해당 플레이어의 차례 종료
                 if is_double==0:
                     break
-
-
                
                
 
