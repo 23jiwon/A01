@@ -97,6 +97,11 @@ player_end_location = [-1, -1, -1, -1]
 
 # 프로그램 내부에서 만든 배열
 
+# 건물 배열
+global build_list
+build_list = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+
 # 현재 통행료 배열
 global now_fee
 now_fee = ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
@@ -139,6 +144,8 @@ global at_island
 at_island = 0
 global is_double
 is_double = 0
+
+
 
 
 # ============================================================================================================
@@ -497,6 +504,8 @@ def input_timer(left_time, require_msg):
         elif player_input[0] != None:
             if require_msg == 'roll':
                 print('[Error]: 주사위 굴리기 명령어를 입력해주십시오')
+                player_input=[None]
+
             elif require_msg == 'festival':
                 city_num = judge_own_city_name(player_input[0])
                 if city_num != False:
@@ -538,6 +547,52 @@ def input_timer(left_time, require_msg):
         print('이거 뜨면 오류임')
         time.sleep(2)
         return False
+
+    # 
+    def warning():
+        global id_info_list
+        global now_order
+        global owner_list
+        global landmark_list
+        if id_info_list[now_order][3] < 2: #경고 세는 부분
+            id_info_list[now_order][3] += 1
+            print('===== 경고 1회 받았습니다. =====')
+        if id_info_list[now_order][3] == 2:
+            id_info_list[now_order][1] = 0 #재산 0으로 만들어서 파산 시켜버림
+            id_info_list[now_order][2] = 0
+            for i in range(20):
+                if owner_list[i] == now_order:
+                    owner_list[i] = 0
+                if landmark_list[i] == now_order:
+                    landmark_list[i] = 0
+            print('====== 경고 2회 누적으로 파산되었습니다 =======')
+            
+    def bankruptcy(player_num):
+        global id_info_list
+        global now_order
+        global owner_list
+        global landmark_list
+        for i in range(20):
+            if city_name == default_map_name[i]:
+                if owner_list[i] != id_list[now_order]: 
+                    return False
+                else:
+                    return i
+        
+        
+        if id_info_list[now_order][3] < 2: #경고 세는 부분
+            id_info_list[now_order][3] += 1
+            print('===== 경고 1회 받았습니다. =====')
+        if id_info_list[now_order][3] == 2:
+            id_info_list[now_order][1] = 0 #재산 0으로 만들어서 파산 시켜버림
+            id_info_list[now_order][2] = 0
+            for i in range(20):
+                if owner_list[i] == now_order:
+                    owner_list[i] = 0
+                if landmark_list[i] == now_order:
+                    landmark_list[i] = 0
+            print('====== 경고 2회 누적으로 파산되었습니다 =======')
+
 # ============================================================================================================
 # 
 #                                      사용자 입력 값 판단 / 읽어오기 끝.
@@ -757,7 +812,30 @@ def draw_basic_map():
 # 
 # ============================================================================================================
 
-#축제 함수
+
+# 랜드마크는 인수가 불가능 하기 때문에 가능한 코드
+# 랜드마크 함수
+def landMark():
+    global landmark_list
+    global owner_list
+    global now_order
+    for i in range(20):
+        if owner_list[i] == now_order+1:
+            landmark_list[i] = 1
+    print('===== 랜드마크 건설 완료! =====')
+
+# 무인도
+def island():
+    global now_order
+    global islandPlayer
+    global is_double
+    print('===== 무인도에 도착했습니다.. =====')
+    if is_double == 3:
+        player_end_location[now_order] = 5
+        # 활동로그파일 기록
+
+
+# 축제 함수
 def festival():
     # 보유중인 도시 없으면 넘어가는걸
     global owner_list
@@ -769,19 +847,51 @@ def festival():
     if own_any_city == 0:
         print('아무 도시도 보유하고 있지 않습니다 ㅠ')
         return
-    
     while True:
         print('>> festival?')
         if input_timer(15,'festival'):
             return
-                    
+
+
+def trip():
+    while True:        
+        print('>> trip?')
+        if input_timer(15, 'trip'):
+            break
+        
+def trip_error(cityName):
+    global tripArea
+    global now_order
+    global default_map_name
+    try:
+        cityName = int(cityName)
+        print('===== ' + default_map_name[cityName] + '(으)로 이동합니다. =====')
+        tripArea = cityName
+        return True
+    except:
+        try:
+            cityName = float(cityName) #이 식에서 에러가 발생하면 문자열이라는 뜻
+            print('[Error]: 유효하지 않은 칸 번호입니다. 0이상 19이하의 정수를 입력해주세요.')
+            return False
+        except:
+            a = 0
+            for i in range(20):
+                if cityName == default_map_name[i]:
+                    print('===== ' + default_map_name[i] + '(으)로 이동합니다. =====')
+                    a = 1
+                    tripArea = i
+                    return False
+            if a == 0: #맵 배열을 다 뒤져봐도 나오지 않음
+                print('[Error]: 입력한 칸은 존재하지 않는 칸입니다.')  
+                return False
+        
 def action(landing_num):
     if landing_num == 0:    # 출발점
-        print('출발점')
+        landMark()
     elif landing_num == 5:  # 무인도
-        print('무인도')
+        island()
     elif landing_num == 10: # 축제위원회
-        print('축제위원회')
+        festival()
     elif landing_num == 15: # 공항
         print('공항')
     else:
@@ -797,6 +907,7 @@ def island():
         player_end_location[now_order] = 5
         player_start_location[now_order] = 5
         # 활동로그파일 기록
+
 
 def player_move(Dice):
     global now_order
@@ -818,7 +929,6 @@ def player_move(Dice):
     time.sleep(2)
     # 액션
 
-
 #커스텀 주사위
 def custom_rollDice():
     firstDice = 0
@@ -832,8 +942,7 @@ def custom_rollDice():
         if input_timer(10,'roll'):
             firstDice = int(input('첫 주사위 :')) #첫번째 주사위
             secondDice = int(input('두번째 주사위 :')) #두번째 주사위
-            totalDice = firstDice + secondDice #주사위들의 합
-            
+            totalDice = firstDice + secondDice #주사위들의 합         
             if islandPlayer[now_order] == 1:
                 print('===== 첫번째 주사위 값: ' + str(firstDice) + ', 두번째 주사위 값: ' + str(secondDice) + ' =====')
                 print('===== 현재 무인도에 있습니다. 이동하지 않습니다. =====')
@@ -868,8 +977,8 @@ def custom_rollDice():
                     return -1
         else:
             break
-    
-    
+            
+            
 #주사위 굴리기 함수, 두개의 주사위 합이 리턴된다, 3번째 더블 나올 시에 0이 리턴된다.
 def rollDice(): 
     firstDice = 0
@@ -884,7 +993,6 @@ def rollDice():
             firstDice = random.randrange(1,7) #첫번째 주사위
             secondDice = random.randrange(1,7) #두번째 주사위
             totalDice = firstDice + secondDice #주사위들의 합
-            
             if player_end_location[now_order] == 5:
                 print('===== 첫번째 주사위 값: ' + str(firstDice) + ', 두번째 주사위 값: ' + str(secondDice) + ' =====')
                 print('===== 현재 무인도에 있습니다. 이동하지 않습니다. =====')
@@ -914,8 +1022,8 @@ def rollDice():
                     print('===== 세번째 더블! =====')
                     print('===== 무인도로 이동합니다 =====')
                     island()
-                    is_double = 0
                     player_move(0)
+                    is_double = 0
                     return -1
         else:
             break
@@ -944,13 +1052,11 @@ def main():
                 draw_basic_map()
                 custom_rollDice()
                 
-
-
-
+                
+                
                 #해당 플레이어의 차례 종료
                 if is_double==0:
                     break
-
                
                
 
