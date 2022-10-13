@@ -894,7 +894,7 @@ def festival():
 def trip():        
     print('>> trip?')
     if input_timer(15, 'trip'):
-        
+        return
 
         
         
