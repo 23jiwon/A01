@@ -4,6 +4,12 @@
 # In[1]:
 
 
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[1]:
+
+
 import time
 from threading import Timer
 import threading
@@ -324,6 +330,11 @@ def login():
     global id_2
     global id_3
     global id_4
+    global id_1_info
+    global id_2_info
+    global id_3_info
+    global id_4_info
+    global id_info_list
     global id_list
     global login_count
     global login_status
@@ -420,6 +431,7 @@ def login():
     id_2_info = [id_2,10000,10000,0]
     id_3_info = [id_3,10000,10000,0]
     id_4_info = [id_4,10000,10000,0]
+    id_info_list = [id_1_info,id_2_info,id_3_info,id_4_info]
     login_status = True
     return
 
@@ -460,13 +472,16 @@ def judge_own_city_name(city_name):
     global owner_list
     global default_map_name
     global id_list
+    global player_input
     try:
         city_num = int(city_name)
         if city_num <= 0 or city_num > 20 or city_num == 5 or city_num == 10 or city_num == 15 or city_name - city_num != 0:
             print('[Error]: 유효하지 않은 도시번호입니다. 특수지역을 제외한 0이상 19이하의 정수를 입력해주세요.')
+            player_input=[None]
             return False
         if owner_list[city_num] != id_list[now_order]:
             print('===== ' + default_map_name[city_num] + ' 도시를 보유하고 있지 않습니다! =====')
+            player_input=[None]
             return False
         else:
             return city_num
@@ -479,6 +494,7 @@ def judge_own_city_name(city_name):
                     return i
         #맵 배열을 다 뒤져봐도 나오지 않음
         print('[Error]: 입력한 도시는 존재하지 않는 도시입니다.')
+        player_input=[None]
         return False
 
 # 입력한 도시 판단하는 함수
@@ -487,10 +503,12 @@ def judge_city_name(city_name):
     global owner_list
     global default_map_name
     global id_list
+    global player_input
     try:
         city_num = int(city_name)
         if city_num < 0 or city_num > 20 or city_name - city_num != 0:
             print('[Error]: 유효하지 않은 도시번호입니다. 0이상 19이하의 정수를 입력해주세요.')
+            player_input=[None]
             return False
         else:
             return city_num
@@ -500,6 +518,7 @@ def judge_city_name(city_name):
                 return i
         #맵 배열을 다 뒤져봐도 나오지 않음
         print('[Error]: 입력한 도시는 존재하지 않는 도시입니다.')
+        player_input=[None]
         return False
 
 def get_player_input(player_input_ref):
@@ -529,6 +548,9 @@ def input_timer(left_time, require_msg):
             if require_msg == 'roll':
                 print('[Error]: 주사위 굴리기 명령어를 입력해주십시오')
                 player_input=[None]
+                i_timer= threading.Thread(target=get_player_input, args=(player_input,))
+                i_timer.daemon = True
+                i_timer.start() 
             elif require_msg == 'festival':
                 city_num = judge_own_city_name(player_input[0])
                 if city_num != False:                 
@@ -728,6 +750,7 @@ def calculate_now_fee():
 
 # 플레이어 위치 출력
 def location_player():
+    global login_count
     global now_location
     for i in range(20):
         temp_location = ''
@@ -739,11 +762,11 @@ def location_player():
             temp_location += color_2 + '● ' + color_0
         else:
             temp_location += '   '
-        if player_start_location[2] == i:
+        if player_start_location[2] == i and login_count > 2:
             temp_location += color_3 + '● ' + color_0
         else:
             temp_location += '   '
-        if player_start_location[3] == i:
+        if player_start_location[3] == i and login_count > 3:
             temp_location += color_4 + '● ' + color_0
         else:
             temp_location += '   '
@@ -866,7 +889,7 @@ def landMark():
     global now_order
     global trading_fee
     for i in range(20):
-        if owner_list[i] == now_order+1 and landmark_list[i] == 0:
+        if owner_list[i] == id_info_list[now_order][0] and landmark_list[i] == 0:
             landmark_list[i] = 1
             id_info_list[now_order][2] += trading_fee[i]
     print('===== 랜드마크 건설 완료! =====')
@@ -916,7 +939,7 @@ def build(num):
     global id_info_list
     global now_order
     global trading_fee
-    if id_info_list[now_order][1] > land_fee[num]: #여기서 매매가 설정
+    if id_info_list[now_order][1] > trading_fee[num]: #여기서 매매가 설정
         print('>> build?')
         build_ans = input_timer(15,'build')
         if build_ans == 2:
@@ -925,7 +948,7 @@ def build(num):
             id_info_list[now_order][2] -= trading_fee[num]
             # 건설 진행
             build_list[num] = 1 # 건물 리스트에 추가
-            owner_list[num] = id_info_list[now_order][0]
+            owner_list[num] = id_info_list[now_order][0]            
             id_info_list[now_order][2] += trading_fee[num]
         elif build_ans == 3:
             print("====== 건설을 포기합니다 ======")
@@ -1019,6 +1042,7 @@ def island():
         player_end_location[now_order] = 5
         # 활동로그파일 기록
         player_start_location[now_order] = player_end_location[now_order]
+    time.sleep(2)
 
 
 def player_move(Dice):
@@ -1026,20 +1050,22 @@ def player_move(Dice):
     global player_start_location
     global player_end_location
     global id_info_list
+    global sec
     time.sleep(2)
     player_end_location[now_order] = player_start_location[now_order] + Dice
-    if player_end_location[now_order] > 20:
+    if player_end_location[now_order] >= 20:
         player_end_location[now_order] -= 20
         # 월급지급
         print('===== 월급이 지급됩니다. =====')
         id_info_list[now_order][1] += 10000
         id_info_list[now_order][2] += 10000
-        time.sleep(2)
     # 활동로그파일 기록
     player_start_location[now_order] = player_end_location[now_order]
     sec = 15
+    time.sleep(2)
     draw_basic_map()
     time.sleep(2)
+    # 액션
     action(player_start_location[now_order])
 
 #커스텀 주사위
@@ -1174,6 +1200,8 @@ def main():
 
 
 main()
+
+
 
 
 
