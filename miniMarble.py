@@ -140,8 +140,6 @@ player_input = [None]
 global islandPlayer
 islandPlayer = [0,0,0,0]
 
-global at_island
-at_island = 0
 global is_double
 is_double = 0
 
@@ -1034,7 +1032,6 @@ def rollDice():
 def main():
     global now_order
     global now_turn
-    global at_island
     global login_count
     global id_info_list
     global sec
@@ -1047,7 +1044,7 @@ def main():
         for j in range(0, login_count):
             now_order = j
             #여기서부터가 플레이어의 턴, while문 내부가 차례
-            while at_island < 2 and id_info_list[now_order][3] < 2 and is_double < 3:
+            while id_info_list[now_order][3] < 2 and is_double < 3:
                 sec = 10
                 draw_basic_map()
                 custom_rollDice()
