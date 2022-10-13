@@ -418,6 +418,10 @@ def login():
     print('===== 유저 ' + str(login_count) + '명 로그인 완료 ======')
     print()    
     id_list = [id_1, id_2, id_3, id_4]
+    id_1_info = [id_1,10000,10000,0]
+    id_2_info = [id_2,10000,10000,0]
+    id_3_info = [id_3,10000,10000,0]
+    id_4_info = [id_4,10000,10000,0]
     login_status = True
     return
 
@@ -467,17 +471,36 @@ def judge_own_city_name(city_name):
         else:
             return city_num
     except:
-        a = 0
         for i in range(20):
             if city_name == default_map_name[i]:
                 if owner_list[i] != id_list[now_order]: 
                     return False
                 else:
                     return i
-        if a == 0: #맵 배열을 다 뒤져봐도 나오지 않음
-            print('[Error]: 입력한 도시는 존재하지 않는 도시입니다.')
-            return False
+        #맵 배열을 다 뒤져봐도 나오지 않음
+        print('[Error]: 입력한 도시는 존재하지 않는 도시입니다.')
+        return False
 
+# 입력한 도시 판단하는 함수
+def judge_city_name(city_name):
+    global now_order
+    global owner_list
+    global default_map_name
+    global id_list
+    try:
+        city_num = int(city_name)
+        if city_num < 0 or city_num > 20 or city_name - city_num != 0:
+            print('[Error]: 유효하지 않은 도시번호입니다. 0이상 19이하의 정수를 입력해주세요.')
+            return False
+        else:
+            return city_num
+    except:
+        for i in range(20):
+            if city_name == default_map_name[i]:
+                return i
+        #맵 배열을 다 뒤져봐도 나오지 않음
+        print('[Error]: 입력한 도시는 존재하지 않는 도시입니다.')
+        return False
 
 def get_player_input(player_input_ref):
     global now_order
@@ -504,15 +527,30 @@ def input_timer(left_time, require_msg):
         elif player_input[0] != None:
             if require_msg == 'roll':
                 print('[Error]: 주사위 굴리기 명령어를 입력해주십시오')
-
                 player_input=[None]
-
             elif require_msg == 'festival':
                 city_num = judge_own_city_name(player_input[0])
-                if city_num != False:
-                    print('===== ' + default_map_name[city_num] + ' 도시에서 축제를 시작합니다! =====')
+                if city_num != False:                 
+                    print('===== ' + default_map_name[city_num] + ' 도시에서 축제를 시작합니다! =====')  
                     now_festival = city_num
-
+                    time.sleep(2)
+                    return True
+            elif require_msg == 'trip':
+                city_num = judge_city_name(player_input[0])
+                if city_num != False:
+                    print('===== ' + default_map_name[city_num] + '(으)로 이동합니다. =====')
+                    time.sleep(2)
+                    
+                    if city_num < 15:
+                        # 월급지급
+                        print('===== 월급이 지급됩니다. =====')
+                        id_info_list[now_order][1] += 10000
+                        id_info_list[now_order][2] += 10000
+                    player_end_location[now_order] = city_num                    
+                    # 활동로그 기록
+                    player_start_location[now_order] = player_end_location[now_order]
+                    time.sleep(2)
+                    return True
             else:
                 print('입력이 틀렸습니다.')
                 player_input=[None]
@@ -550,52 +588,44 @@ def input_timer(left_time, require_msg):
         time.sleep(2)
         return False
 
-    
-    # 
-    def warning():
-        global id_info_list
-        global now_order
-        global owner_list
-        global landmark_list
-        if id_info_list[now_order][3] < 2: #경고 세는 부분
-            id_info_list[now_order][3] += 1
-            print('===== 경고 1회 받았습니다. =====')
-        if id_info_list[now_order][3] == 2:
-            id_info_list[now_order][1] = 0 #재산 0으로 만들어서 파산 시켜버림
-            id_info_list[now_order][2] = 0
-            for i in range(20):
-                if owner_list[i] == now_order:
-                    owner_list[i] = 0
-                if landmark_list[i] == now_order:
-                    landmark_list[i] = 0
-            print('====== 경고 2회 누적으로 파산되었습니다 =======')
-            
-    def bankruptcy(player_num):
-        global id_info_list
-        global now_order
-        global owner_list
-        global landmark_list
-        for i in range(20):
-            if city_name == default_map_name[i]:
-                if owner_list[i] != id_list[now_order]: 
-                    return False
-                else:
-                    return i
-        
-        
-        if id_info_list[now_order][3] < 2: #경고 세는 부분
-            id_info_list[now_order][3] += 1
-            print('===== 경고 1회 받았습니다. =====')
-        if id_info_list[now_order][3] == 2:
-            id_info_list[now_order][1] = 0 #재산 0으로 만들어서 파산 시켜버림
-            id_info_list[now_order][2] = 0
-            for i in range(20):
-                if owner_list[i] == now_order:
-                    owner_list[i] = 0
-                if landmark_list[i] == now_order:
-                    landmark_list[i] = 0
-            print('====== 경고 2회 누적으로 파산되었습니다 =======')
 
+# 파산      
+def bankruptcy():
+    global id_info_list
+    global now_order
+    global owner_list
+    global landmark_list
+    global build_list
+    global now_festival
+    for i in range(20):
+        if owner_list[i] == id_list[now_order]: 
+            owner_list[i] = 0
+            build_list[i] = 0
+            landmark_list[i] = 0
+            id_info_list[now_order][1] = 0 #재산 0으로 만들어서 파산 시켜버림
+            id_info_list[now_order][2] = 0
+            if now_festival == i:
+                now_festival = -1
+    if id_info_list[now_order][3] != 2:
+        print('====== '+id_info_list[now_order][0]+'님 파산하였습니다 =======')
+        id_info_list[now_order][3] = 2
+    else:
+        print('====== '+id_info_list[now_order][0]+'님 경고 2회 누적으로 중도포기되었습니다 =======')
+    time.sleep(2)
+            
+
+# 경고, 중도포기
+def warning():
+    global id_info_list
+    global now_order
+    global owner_list
+    global landmark_list
+    if id_info_list[now_order][3] < 2: #경고 세는 부분
+        id_info_list[now_order][3] += 1
+        print('===== 경고 1회 받았습니다. =====')
+        time.sleep(2)
+    if id_info_list[now_order][3] == 2:
+        bankruptcy()
 
 # ============================================================================================================
 # 
@@ -827,6 +857,7 @@ def landMark():
         if owner_list[i] == now_order+1:
             landmark_list[i] = 1
     print('===== 랜드마크 건설 완료! =====')
+    time.sleep(2)
 
 # 무인도
 def island():
@@ -837,61 +868,37 @@ def island():
     if is_double == 3:
         player_end_location[now_order] = 5
         # 활동로그파일 기록
+        player_start_location[now_order] = player_end_location[now_order]
 
 
 # 축제 함수
-
 def festival():
     # 보유중인 도시 없으면 넘어가는걸
     global owner_list
     global now_order
+    global id_list
     own_any_city = 0
     for i in range (20):
-        if owner_list[i] == now_order + 1:
+        if owner_list[i] == id_list[now_order]:
             own_any_city += 1
     if own_any_city == 0:
         print('아무 도시도 보유하고 있지 않습니다 ㅠ')
         return
-
-
-    while True:
-        print('>> festival?')
-        if input_timer(15,'festival'):
-            return
-
-def trip():
-    while True:        
-        print('>> trip?')
-        if input_timer(15, 'trip'):
-            break
+    print('>> festival?')
+    if input_timer(15,'festival'):
+        return
         
-def trip_error(cityName):
-    global tripArea
-    global now_order
-    global default_map_name
-    try:
-        cityName = int(cityName)
-        print('===== ' + default_map_name[cityName] + '(으)로 이동합니다. =====')
-        tripArea = cityName
-        return True
-    except:
-        try:
-            cityName = float(cityName) #이 식에서 에러가 발생하면 문자열이라는 뜻
-            print('[Error]: 유효하지 않은 칸 번호입니다. 0이상 19이하의 정수를 입력해주세요.')
-            return False
-        except:
-            a = 0
-            for i in range(20):
-                if cityName == default_map_name[i]:
-                    print('===== ' + default_map_name[i] + '(으)로 이동합니다. =====')
-                    a = 1
-                    tripArea = i
-                    return False
-            if a == 0: #맵 배열을 다 뒤져봐도 나오지 않음
-                print('[Error]: 입력한 칸은 존재하지 않는 칸입니다.')  
-                return False
+# 공항 함수
+def trip():        
+    print('>> trip?')
+    if input_timer(15, 'trip'):
+        
+        
         
 def action(landing_num):
+    global now_order
+    global owner_list    
+    global id_list
     if landing_num == 0:    # 출발점
         landMark()
     elif landing_num == 5:  # 무인도
@@ -899,10 +906,15 @@ def action(landing_num):
     elif landing_num == 10: # 축제위원회
         festival()
     elif landing_num == 15: # 공항
-        print('공항')
-
+        trip()
     else:
-         print('도시')
+        if owner_list[landing_num] == 0:
+            # 빈 도시
+        elif owner_list[landing_num] != id_list[now_order]:
+            # 남 도시
+        elif owner_list[landing_num] == id_list[now_order]:
+            # 내 도시
+            
         
 
 
@@ -918,6 +930,7 @@ def player_move(Dice):
         # 월급지급
         print('===== 월급이 지급됩니다. =====')
         id_info_list[now_order][1] += 10000
+        id_info_list[now_order][2] += 10000
     # 활동로그파일 기록
     player_start_location[now_order] = player_end_location[now_order]
     sec = 15
@@ -1069,13 +1082,6 @@ def main():
 main()
 
 
-
-
-
-
-
-
-               
 
 
 # In[ ]:
