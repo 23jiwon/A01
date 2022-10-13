@@ -1034,13 +1034,13 @@ def player_move(Dice):
         print('===== 월급이 지급됩니다. =====')
         id_info_list[now_order][1] += 10000
         id_info_list[now_order][2] += 10000
+        time.sleep(2)
     # 활동로그파일 기록
     player_start_location[now_order] = player_end_location[now_order]
     sec = 15
-    time.sleep(2)
     draw_basic_map()
     time.sleep(2)
-    # 액션
+    action(player_start_location[now_order])
 
 #커스텀 주사위
 def custom_rollDice():
