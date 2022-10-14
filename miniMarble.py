@@ -4,6 +4,12 @@
 # In[1]:
 
 
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[1]:
+
+
 import time
 from threading import Timer
 import threading
@@ -1265,13 +1271,3 @@ def main():
 
 
 main()
-
-
-
-
-
-# In[ ]:
-
-
-
-
