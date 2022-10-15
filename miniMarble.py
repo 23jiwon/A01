@@ -1,15 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
-
-
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
-
-
 import time
 from threading import Timer
 import threading
@@ -141,7 +129,11 @@ islandPlayer = [0,0,0,0]
 global is_double
 is_double = 0
 
+global landing_owner
+landing_owner = None
 
+global rank_list
+rank_list = []
 
 
 # ============================================================================================================
@@ -484,6 +476,11 @@ def judge_own_city_name(city_name):
                     return False
                 else:
                     return i
+
+        if city_name == '출발점' or city_name == '무인도' or city_name == '축제위원회' or city_name == '공항':
+            print('[Error]: 특수지역을 제외한 도시를 입력해주세요.')
+            return False
+
         #맵 배열을 다 뒤져봐도 나오지 않음
         print('[Error]: 입력한 도시는 존재하지 않는 도시입니다.')
         player_input=[None]
@@ -503,11 +500,25 @@ def judge_city_name(city_name):
             player_input=[None]
             return False
         else:
-            return city_num
+
+            if city_num == 0:
+                return -1
+            else:
+                return city_num
     except:
         for i in range(20):
             if city_name == default_map_name[i]:
+                if i == 0:
+                    return -1
                 return i
+        if city_name == '출발점':
+            return -1
+        elif city_name == '무인도':
+            return 5
+        elif city_name == '축제위원회':
+            return 10
+        elif city_name == '공항':
+            return 15
         #맵 배열을 다 뒤져봐도 나오지 않음
         print('[Error]: 입력한 도시는 존재하지 않는 도시입니다.')
         player_input=[None]
@@ -526,14 +537,14 @@ def input_timer(left_time, require_msg):
     global id_list
     global id_info_list
     global now_festival
-    global default_map_name
+    global print_map_name
     global trading_fee
     player_input=[None]
     i_timer= threading.Thread(target=get_player_input, args=(player_input,))
     i_timer.daemon = True
     i_timer.start()  
 
-    for i in range(left_time):
+    for i in range(left_time * 2):
         if input_check(require_msg, player_input[0]):
             return True
         elif player_input[0] != None:
@@ -545,8 +556,7 @@ def input_timer(left_time, require_msg):
                 print('[Error]: 인자의 개수가 적습니다. 1개의 인자를 입력해주세요.')
             elif(b_res):
                 #문자열 사이에 공백이 있다면
-                print('[Error]: 인자의 개수가 많습니다. 1개의 인자를 입력해주세요.') 
-            
+                print('[Error]: 인자의 개수가 많습니다. 1개의 인자를 입력해주세요.')
             if require_msg == 'roll':
                 print('[Error]: 주사위 굴리기 명령어를 입력해주세요.')
                 player_input=[None]
@@ -556,12 +566,13 @@ def input_timer(left_time, require_msg):
             elif require_msg == 'festival':
                 city_num = judge_own_city_name(player_input[0])
                 if city_num != False:                 
-                    print('===== ' + default_map_name[city_num] + ' 도시에서 축제를 시작합니다! =====')  
+                    print('===== ' + print_map_name[city_num].rstrip()  + ' 도시에서 축제를 시작합니다! =====')  
                     now_festival = city_num
                     time.sleep(1)
                     return True
                 else:
-                    print('[Error]:도시명 또는 도시번호를 입력하세요.')
+                    print('[Error]:축제를 개최할 도시명 또는 도시번호를 입력하세요.')
+
                     player_input=[None]
                     i_timer= threading.Thread(target=get_player_input, args=(player_input,))
                     i_timer.daemon = True
@@ -569,22 +580,27 @@ def input_timer(left_time, require_msg):
             elif require_msg == 'trip':
                 city_num = judge_city_name(player_input[0])
                 if city_num != False:
-                    if city_num == 10:
-                        print('===== 공항 도시로 이동합니다. =====')
+                    if city_num == 15:
+                        print('===== 이미 공항 도시에 있습니다. =====')
+                        time.sleep(1)
                         return city_num
-                    print('===== ' + default_map_name[city_num] + '(으)로 이동합니다. =====')
+                    if city_num == -1:
+                        city_num = 0
+                    print('===== ' + print_map_name[city_num].rstrip()  + '(으)로 이동합니다. =====')
                     if city_num < 15:
                         # 월급지급
                         print('===== 월급을 수령했습니다. =====')
-                        id_info_list[now_order][1] += 10000
-                        id_info_list[now_order][2] += 10000
+                        id_info_list[now_order][1] += 1000
+                        id_info_list[now_order][2] += 1000
+
                     player_end_location[now_order] = city_num                    
                     # 활동로그 기록
                     player_start_location[now_order] = player_end_location[now_order]
                     time.sleep(1)
                     return city_num
                 else:
-                    print('[Error]:도시명 또는 도시번호를 입력하세요.')
+                    print('[Error]:여행갈 도시명 또는 도시번호를 입력하세요.')
+
                     player_input=[None]
                     i_timer= threading.Thread(target=get_player_input, args=(player_input,))
                     i_timer.daemon = True
@@ -623,11 +639,12 @@ def input_timer(left_time, require_msg):
                     i_timer.start()
             else:
                 print('[Error]:입력이 틀렸습니다. 다시 입력하세요.')
-                player_input=[None]
+                player_input = [None]
                 i_timer= threading.Thread(target=get_player_input, args=(player_input,))
                 i_timer.daemon = True
                 i_timer.start()  
-        time.sleep(1)
+        time.sleep(0.5)
+
         
     if player_input[0] == None:
         print('\n===== %d초가 지났습니다. =====' % left_time)
@@ -641,10 +658,8 @@ def input_timer(left_time, require_msg):
                 player_input = [None]
                 break
         return False
-    else:
-        print('이거 뜨면 오류임')
-        time.sleep(2)
-        return False
+    return False
+
 
 
 
@@ -657,6 +672,10 @@ def bankruptcy(dice = 0):
     global build_list
     global now_festival
     global player_input
+    global rank_list
+    global is_double
+    is_double = 0
+
     for i in range(20):
         if owner_list[i] == id_list[now_order]: 
             owner_list[i] = 0
@@ -665,22 +684,19 @@ def bankruptcy(dice = 0):
             if now_festival == i:
                 now_festival = -1
 
-    #player_start_location[now_order] = 21
-    id_info_list[now_order][3] = 2
+    player_start_location[now_order] = -1
     id_info_list[now_order][1] = 0 #재산 0으로 만들어서 파산 시켜버림
     id_info_list[now_order][2] = 0
-
+    
     if dice:
         print('====== '+id_info_list[now_order][0]+'님 주사위를 던지지 않아 중도포기되었습니다 =======')
         
-    elif id_info_list[now_order][3] != 2:
-        print('====== '+id_info_list[now_order][0]+'님 파산하였습니다 =======')
-        
-    else:
+    elif id_info_list[now_order][3] == 2:
         print('====== '+id_info_list[now_order][0]+'님 경고 2회 누적으로 중도포기되었습니다 =======')
-        
-
-    
+    else:
+        print('====== '+id_info_list[now_order][0]+'님 파산하였습니다 =======')
+    id_info_list[now_order][3] = 2 
+    rank_list.append(id_info_list[now_order][0])
     time.sleep(2)
             
 # 경고, 중도포기
@@ -843,7 +859,7 @@ def draw_basic_map():
         print('┃  %s ┃                                                       ┃  %s ┃ ┃ \033[31m%-18s\033[0m┃ '%(print_map_name[9],print_map_name[16],id_info_list[0][0]))
     else:
         print('┃  %s ┃                                                       ┃  %s ┃ ┃ %-18s┃ '%(print_map_name[9],print_map_name[16],id_info_list[0][0]))
-    print('┃  %s ┃                                                       ┃  %s ┃ ┃                   ┃ ' %(print_fee[9],print_fee[16]))
+    print('┃  %s ┃                                                       ┃  %s ┃ ┃ 전재산%9s 원┃ ' %(print_fee[9],print_fee[16],id_info_list[0][2]))
     print('┃ %s┃                                                       ┃ %s┃ ┃ %15s 원┃ ' %(now_location[9], now_location[16],id_info_list[0][1]))
     print('┗ ━ ━ ━ ━ ━ ━ ┛                                                       ┗ ━ ━ ━ ━ ━ ━ ┛ ┗ ┫ '+color_1+'●'+color_0+'┣ ━ ━ ━ ━ ━ ━ ┛ ')
     print('┏ ┫ 08┣ ━ %s━ ┓                                                       ┏ ┫ 17┣ ━ %s━ ┓ ┏ ┫ 02┣ ━ ━ ━ ━ ━ ━ ┓ '%(now_building[8], now_building[17]))
@@ -851,7 +867,7 @@ def draw_basic_map():
         print('┃  %s ┃                                                       ┃  %s ┃ ┃ \033[31m%-18s\033[0m┃ '%(print_map_name[8],print_map_name[17],id_info_list[1][0]))
     else:
         print('┃  %s ┃                                                       ┃  %s ┃ ┃ %-18s┃ '%(print_map_name[8],print_map_name[17],id_info_list[1][0]))
-    print('┃  %s ┃                                                       ┃  %s ┃ ┃                   ┃ ' %(print_fee[8],print_fee[17]))
+    print('┃  %s ┃                                                       ┃  %s ┃ ┃ 전재산%9s 원┃ ' %(print_fee[8],print_fee[17],id_info_list[1][2]))
     print('┃ %s┃                                                       ┃ %s┃ ┃ %15s 원┃ ' %(now_location[8], now_location[17],id_info_list[1][1]))
     print('┗ ━ ━ ━ ━ ━ ━ ┛                                                       ┗ ━ ━ ━ ━ ━ ━ ┛ ┗ ┫ '+color_2+'●'+color_0+'┣ ━ ━ ━ ━ ━ ━ ┛ ')
     print('┏ ┫ 07┣ ━ %s━ ┓                                                       ┏ ┫ 18┣ ━ %s━ ┓ '%(now_building[7], now_building[18]), end='')
@@ -869,7 +885,7 @@ def draw_basic_map():
         print('')
     print('┃  %s ┃                                                       ┃  %s ┃ ' %(print_fee[7],print_fee[18]), end='')
     if login_count > 2:
-        print('┃                   ┃ ')
+        print('┃ 전재산%9s 원┃ ' % id_info_list[2][2])
     else:
         print('')
     print('┃ %s┃                                                       ┃ %s┃ ' %(now_location[7], now_location[18]), end='')
@@ -897,7 +913,7 @@ def draw_basic_map():
         print('')
     print('┃  %s ┃                                                       ┃  %s ┃ ' %(print_fee[6],print_fee[19]), end='')
     if login_count > 3:
-          print('┃                   ┃ ')
+          print('┃ 전재산%9s 원┃ '% id_info_list[3][2])
     else:
         print('')
     print('┃ %s┃                                                       ┃ %s┃ ' %(now_location[6], now_location[19]), end='')
@@ -935,11 +951,18 @@ def landMark():
     global owner_list
     global now_order
     global trading_fee
+    have_building = 0
+
     for i in range(20):
         if owner_list[i] == id_info_list[now_order][0] and landmark_list[i] == 0:
             landmark_list[i] = 1
             id_info_list[now_order][2] += trading_fee[i]
-    print('===== 랜드마크 건설 완료! =====')
+            have_building += 1
+    if have_building > 0:
+        print('===== %d개 지역 랜드마크 건설 완료! =====' % have_building)
+    else:
+        print('===== 랜드마크로 건설할 건물이 없습니다! =====')
+
     time.sleep(1)
 
 # 무인도
@@ -953,7 +976,8 @@ def island():
         player_end_location[now_order] = 5
         # 활동로그파일 기록
         player_start_location[now_order] = player_end_location[now_order]
-        is_double = 0
+    is_double = 0
+
     time.sleep(1)
 
 # 축제 함수
@@ -980,7 +1004,8 @@ def trip():
     print('>> trip?')
     landing_num = input_timer(15, 'trip')
     draw_basic_map()
-    if landing_num != 10:
+    if landing_num != 15:
+
         action(landing_num)
         
 
@@ -992,7 +1017,8 @@ def build(num):
     global id_info_list
     global now_order
     global trading_fee
-    if id_info_list[now_order][1] > trading_fee[num]: #여기서 매매가 설정
+    if id_info_list[now_order][1] >= trading_fee[num]: #여기서 매매가 설정
+
         print('>> build?')
         build_flag = input_timer(15,'build')
         if build_flag == 2:
@@ -1008,50 +1034,85 @@ def build(num):
     else:
         print("[Error]: 매입을 진행할 돈이 부족합니다. 매입을 포기합니다.")
     time.sleep(1)
-      
-def takeover(landing_num):
+
+def takeover(landing_num,landing_owner):
     global id_info_list
     global takeover_fee
     global landmark_list
     global trading_fee
-    if(id_info_list[now_order][1] > takeover_fee[landing_num]) and landmark_list[landing_num] == 0: #여기서 인수가 설정
+    if(id_info_list[now_order][1] >= takeover_fee[landing_num]) and landmark_list[landing_num] == 0: #여기서 인수가 설정
+
         print('>> takeover?')
         takeover_flag = input_timer(15,'takeover')
         if takeover_flag == 2:
             print("====== 인수를 진행합니다 ======")
             id_info_list[now_order][1] -= takeover_fee[landing_num] #자산차감
             id_info_list[now_order][2] -= takeover_fee[landing_num]                
+            id_info_list[landing_owner][1] += takeover_fee[landing_num]           
+            id_info_list[landing_owner][2] = id_info_list[landing_owner][2] + takeover_fee[landing_num] - trading_fee[landing_num]
+
             # 인수 진행 액션 코드
             owner_list[landing_num] = id_info_list[now_order][0]
             id_info_list[now_order][2] += trading_fee[landing_num]
         elif takeover_flag == 3:
             print("====== 인수를 포기합니다 ======")
             # 건설 포기 액션 코드
+    elif landmark_list[landing_num] == 1:
+        print("[Error]: 랜드마크는 인수할 수 없습니다.")
     else:
         print("[Error]: 인수를 진행할 돈이 부족합니다. 인수를 포기합니다.")
     time.sleep(1)
         
-def pay_fee(landing_num):
+def pay_fee(landing_num, all = 0):
     global now_order
     global owner_list    
     global id_info_list
     global now_fee
-    id_info_list[now_order][1] -= now_fee[landing_num]
-    id_info_list[now_order][2] -= now_fee[landing_num]
-    if id_info_list[0][0] == owner_list[landing_num]:
-        id_info_list[0][1] += now_fee[landing_num]
-        id_info_list[0][2] += now_fee[landing_num]
-    elif id_info_list[1][0] == owner_list[landing_num]:
-        id_info_list[1][1] += now_fee[landing_num]
-        id_info_list[1][2] += now_fee[landing_num]
-    elif id_info_list[2][0] == owner_list[landing_num]:
-        id_info_list[2][1] += now_fee[landing_num]
-        id_info_list[2][2] += now_fee[landing_num]
-    elif id_info_list[3][0] == owner_list[landing_num]:
-        id_info_list[3][1] += now_fee[landing_num]
-        id_info_list[3][2] += now_fee[landing_num]
-    draw_basic_map()
-    print('===== 현재 전 재산은 '+ str(id_info_list[now_order][2]) + '원 입니다. =====')
+
+    global landing_owner
+    landing_owner = None
+    
+    if all == 0:
+        id_info_list[now_order][1] -= now_fee[landing_num]
+        id_info_list[now_order][2] -= now_fee[landing_num]
+        if id_info_list[0][0] == owner_list[landing_num]:
+            id_info_list[0][1] += now_fee[landing_num]
+            id_info_list[0][2] += now_fee[landing_num]
+            landing_owner = 0
+        elif id_info_list[1][0] == owner_list[landing_num]:
+            id_info_list[1][1] += now_fee[landing_num]
+            id_info_list[1][2] += now_fee[landing_num]
+            landing_owner = 1
+        elif id_info_list[2][0] == owner_list[landing_num]:
+            id_info_list[2][1] += now_fee[landing_num]
+            id_info_list[2][2] += now_fee[landing_num]
+            landing_owner = 2
+        elif id_info_list[3][0] == owner_list[landing_num]:
+            id_info_list[3][1] += now_fee[landing_num]
+            id_info_list[3][2] += now_fee[landing_num]
+            landing_owner = 3
+        draw_basic_map()
+        print('통행료를 지불하였습니다.')
+        time.sleep(1)
+        takeover(landing_num,landing_owner)
+    else:
+        if id_info_list[0][0] == owner_list[landing_num]:
+            id_info_list[0][1] += id_info_list[now_order][2]
+            id_info_list[0][2] += id_info_list[now_order][2]
+            landing_owner = 0
+        elif id_info_list[1][0] == owner_list[landing_num]:
+            id_info_list[1][1] += id_info_list[now_order][2]
+            id_info_list[1][2] += id_info_list[now_order][2]
+            landing_owner = 1
+        elif id_info_list[2][0] == owner_list[landing_num]:
+            id_info_list[2][1] += id_info_list[now_order][2]
+            id_info_list[2][2] += id_info_list[now_order][2]
+            landing_owner = 2
+        elif id_info_list[3][0] == owner_list[landing_num]:
+            id_info_list[3][1] += id_info_list[now_order][2]
+            id_info_list[3][2] += id_info_list[now_order][2]
+            landing_owner = 3
+
     time.sleep(1)
         
 def sell_property(sell_num):
@@ -1064,14 +1125,19 @@ def sell_property(sell_num):
     global build_list
     global landmark_list
     global now_festival
-    id_info_list[now_order][1] += trading_fee[sell_num] + trading_fee[sell_num] * landmark_list[sell_num] #매각된 땅값을 현금에 포함
-    id_info_list[now_order][2] += trading_fee[sell_num] + trading_fee[sell_num] * landmark_list[sell_num] #매각된 땅값을 전재산에 포함
+    id_info_list[now_order][1] = id_info_list[now_order][1] + trading_fee[sell_num] + (trading_fee[sell_num] * landmark_list[sell_num]) #매각된 땅값을 현금에 포함
+    id_info_list[now_order][2] = id_info_list[now_order][2] + trading_fee[sell_num] + (trading_fee[sell_num] * landmark_list[sell_num]) #매각된 땅값을 전재산에 포함
+    id_info_list[now_order][2] = id_info_list[now_order][2] -  trading_fee[sell_num] - (trading_fee[sell_num] * landmark_list[sell_num])
     owner_list[sell_num] = 0 #소유지를 무소유로 바꿈
     landmark_list[sell_num] = 0
     build_list[sell_num] = 0
     if now_festival == sell_num:
         now_festival = -1
+
+    draw_basic_map()
     print('===== ' + default_map_name[sell_num] + ' 도시 매각을 진행합니다. =====')
+    time.sleep(1)
+
         
         
         
@@ -1094,9 +1160,10 @@ def action(landing_num):
         elif owner_list[landing_num] != id_info_list[now_order][0]: # 남 도시
             if now_fee[landing_num] <= id_info_list[now_order][1]:
                 pay_fee(landing_num)
-                takeover(landing_num)
             elif now_fee[landing_num] <= id_info_list[now_order][2] and now_fee[landing_num] > id_info_list[now_order][1]:
                 while True:
+                    print('>> 매각하려는 도시를 입력해주세요.')
+
                     sell_num = input_timer(15,'sell')
                     sell_property(sell_num)
                     if now_fee[landing_num] <= id_info_list[now_order][1]:
@@ -1105,10 +1172,10 @@ def action(landing_num):
                     else:
                         print('===== 현재 현금자산은 '+ str(id_info_list[now_order][1]) + '원 입니다. 자산이 부족하므로 추가 매각을 진행합니다. =====')
                         time.sleep(1)
-                takeover(landing_num)
             else:
-                bankruptcy()
-                
+                pay_fee(landing_num,1)
+                bankruptcy()                
+
         elif owner_list[landing_num] == id_info_list[now_order][0]:
             print('===== 내 도시라 편안해요~ =====')
             time.sleep(1)
@@ -1118,6 +1185,7 @@ def action(landing_num):
 
 def player_move(Dice):
     global now_order
+    global now_turn
     global player_start_location
     global player_end_location
     global id_info_list
@@ -1125,10 +1193,15 @@ def player_move(Dice):
     player_end_location[now_order] = player_start_location[now_order] + Dice
     if player_end_location[now_order] >= 20:
         player_end_location[now_order] -= 20
-        # 월급지급
+        if player_end_location[now_order] > 0:
+            # 월급지급
+            print('===== 월급을 수령했습니다. =====')
+            id_info_list[now_order][1] += 1000
+            id_info_list[now_order][2] += 1000
+    elif now_turn > 1 and player_start_location[now_order] == 0:
         print('===== 월급을 수령했습니다. =====')
-        id_info_list[now_order][1] += 10000
-        id_info_list[now_order][2] += 10000
+        id_info_list[now_order][1] += 1000
+        id_info_list[now_order][2] += 1000
     # 활동로그파일 기록
     player_start_location[now_order] = player_end_location[now_order]
     sec = 15
@@ -1181,8 +1254,6 @@ def custom_rollDice():
                     print('===== 세번째 더블! =====')
                     print('===== 무인도로 이동합니다 =====')
                     island()
-                    player_move(0)
-                    is_double = 0
                     return -1
         else:
             break
@@ -1231,26 +1302,71 @@ def rollDice():
                     print('===== 세번째 더블! =====')
                     print('===== 무인도로 이동합니다 =====')
                     island()
-                    player_move(0)
-                    is_double = 0
                     return -1
         else:
             break
 
-            
+def print_rank():
+    global rank_list
+    global login_count
+    rank_num = 1
+    for i in range(login_count-1,-1,-1):
+        print(str(rank_num) + '등 ' + rank_list[i])
+        rank_num += 1
+    
+
+def isSuccess():
+    global now_turn
+    global id_info_list
+    global madelist_flag
+    global login_count
+    global rank_list
+    id_count = 0 #이긴 사람 아이디 번호 저장용
+    global money_list
+    money_list = [0, 0, 0, 0]
+    if now_turn > 10:
+        print('게임을 종료합니다')
+        for i in range(login_count):
+            money_list[i] = id_info_list[i][2]#money_list 만드는중
+        max_money = money_list[0] # 최대 재산을 첫번째 유저 재산으로 초기화
+        for i in money_list:
+            if max_money < i: # 만약 해당 유저 재산이 최대 재산보다 많으면 갱신
+                max_money = i
+                id_success_num = id_count                
+            id_count += 1
+        draw_basic_map()
+        print('===== ' + id_info_list[id_success_num][0] + ' 님이 승리하였습니다 ======')
+        rank_list.append(id_info_list[id_success_num][0])
+        print_rank()
+        return True
+    elif now_turn <= 10:
+        bankruptcy_count = 0
+        #본인 턴 처리
+        for i in range(login_count):
+            if id_info_list[i][3] == 2:
+                bankruptcy_count += 1
+        draw_basic_map()
+        if bankruptcy_count == login_count - 1:# 자길 제외하고 다 파산하면 승리
+            print('===== ' + id_info_list[now_order][0] + ' 님이 승리하였습니다 ======')
+            rank_list.append(id_info_list[now_order][0])
+            print_rank()
+            return True
+    return False
+
+         
 id_1 = 'player1'
 id_2 = 'player2'
 id_3 = 'player3'
 id_4 = 'player4'
 login_count = 4
 id_list = [id_1, id_2, id_3, id_4]
-id_1_info = [id_1,10000,10000,0]
-id_2_info = [id_2,10000,10000,0]
-id_3_info = [id_3,10000,10000,0]
-id_4_info = [id_4,10000,10000,0]
+id_1_info = [id_1,1000,1000,0]
+id_2_info = [id_2,1000,1000,0]
+id_3_info = [id_3,1000,1000,0]
+id_4_info = [id_4,1000,1000,0]
 id_info_list = [id_1_info,id_2_info,id_3_info,id_4_info]
 login_status = True    
-                          
+    
 def main():
     global now_order
     global now_turn
@@ -1259,13 +1375,18 @@ def main():
     global sec
     #회원가입/로그인
     #if menu() == 0:
-    #    return         
-    for i in range(1,11):
+    #    return     
+    for i in range(1,12):
+
         now_turn = i
         for j in range(0, login_count):
             now_order = j
             #여기서부터가 플레이어의 턴, while문 내부가 차례
             while id_info_list[now_order][3] < 2 and is_double < 3:
+                if isSuccess():
+                    input('게임이 끝났습니다. 종료하려면 enter를 눌러주세요.')
+                    return
+
                 sec = 10
                 draw_basic_map()
                 custom_rollDice()
