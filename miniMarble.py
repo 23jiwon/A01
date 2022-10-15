@@ -108,7 +108,7 @@ global now_building
 now_building = ['━ ','━ ','━ ','━ ','━ ','━ ','━ ','━ ','━ ','━ ','━ ','━ ','━ ','━ ','━ ','━ ','━ ','━ ','━ ','━ ']
 # 말 출력용 배열
 global now_location
-now_location = ['            ','            ','            ','            ','            ','            ','            ','            ','            ','            ','            ','            ','            ','            ','            ','            ','            ','            ','            ','            ']
+now_location = ['            ','            ','            ','            ','            ','            ','            ','            ','            ','            ','            ','            ','            ','            ','            ','            ','            ','            ','            ','            ','            ']
 # 출력용 건물명 배열
 global print_map_name
 print_map_name = ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
@@ -662,18 +662,25 @@ def bankruptcy(dice = 0):
             owner_list[i] = 0
             build_list[i] = 0
             landmark_list[i] = 0
-            id_info_list[now_order][1] = 0 #재산 0으로 만들어서 파산 시켜버림
-            id_info_list[now_order][2] = 0
             if now_festival == i:
                 now_festival = -1
-                
+
+    #player_start_location[now_order] = 21
+    id_info_list[now_order][3] = 2
+    id_info_list[now_order][1] = 0 #재산 0으로 만들어서 파산 시켜버림
+    id_info_list[now_order][2] = 0
+
     if dice:
         print('====== '+id_info_list[now_order][0]+'님 주사위를 던지지 않아 중도포기되었습니다 =======')
+        
     elif id_info_list[now_order][3] != 2:
         print('====== '+id_info_list[now_order][0]+'님 파산하였습니다 =======')
-        id_info_list[now_order][3] = 2
+        
     else:
         print('====== '+id_info_list[now_order][0]+'님 경고 2회 누적으로 중도포기되었습니다 =======')
+        
+
+    
     time.sleep(2)
             
 # 경고, 중도포기
@@ -783,7 +790,7 @@ def calculate_now_fee():
 def location_player():
     global login_count
     global now_location
-    for i in range(20):
+    for i in range(21):
         temp_location = ''
         if player_start_location[0] == i:
             temp_location += color_1 + '● ' + color_0
@@ -946,6 +953,7 @@ def island():
         player_end_location[now_order] = 5
         # 활동로그파일 기록
         player_start_location[now_order] = player_end_location[now_order]
+        is_double = 0
     time.sleep(1)
 
 # 축제 함수
@@ -1147,6 +1155,7 @@ def custom_rollDice():
                 print('===== 첫번째 주사위 값: ' + str(firstDice) + ', 두번째 주사위 값: ' + str(secondDice) + ' =====')
                 print('===== 현재 무인도에 있습니다. 이동하지 않습니다. =====')
                 islandPlayer[now_order] = 0
+                is_double = 0
                 time.sleep(1)
                 return 0
             if firstDice != secondDice:
