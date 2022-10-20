@@ -20,6 +20,7 @@ id_list = [id_1, id_2, id_3, id_4]
 
 # 타이머
 global sec
+sec = 15
 
 # 'map.txt'에서 불러온 배열
 
@@ -135,6 +136,8 @@ landing_owner = None
 global rank_list
 rank_list = []
 
+global salary
+salary = 10000
 
 # ============================================================================================================
 # 
@@ -187,6 +190,7 @@ def menu():
                 # 여기서부터 게임 파트
         else:
             print('[Error]: 명령어가 올바르지 않습니다. 다시 입력해 주세요.')
+            time.sleep(1)
             menu()
 
 def register():
@@ -447,6 +451,11 @@ def input_check(require, p_input):
                 return True
             else:
                 return False
+        case 'cr'|'커'|'croll'|'ㅋㅈ':
+            if(require == 'roll'):        
+                return 2
+            else:
+                return False
         case _:
             return False
 
@@ -539,14 +548,18 @@ def input_timer(left_time, require_msg):
     global now_festival
     global print_map_name
     global trading_fee
+    global salary
     player_input=[None]
     i_timer= threading.Thread(target=get_player_input, args=(player_input,))
     i_timer.daemon = True
     i_timer.start()  
 
     for i in range(left_time * 2):
-        if input_check(require_msg, player_input[0]):
+        inputcheck = input_check(require_msg, player_input[0])
+        if inputcheck == 1:
             return True
+        elif inputcheck == 2:
+            return 2
         elif player_input[0] != None:
             b_res = 0
             if re.search(' ' , player_input[0]) != None:
@@ -590,8 +603,8 @@ def input_timer(left_time, require_msg):
                     if city_num < 15:
                         # 월급지급
                         print('===== 월급을 수령했습니다. =====')
-                        id_info_list[now_order][1] += 1000
-                        id_info_list[now_order][2] += 1000
+                        id_info_list[now_order][1] += salary
+                        id_info_list[now_order][2] += salary
 
                     player_end_location[now_order] = city_num                    
                     # 활동로그 기록
@@ -859,7 +872,7 @@ def draw_basic_map():
         print('┃  %s ┃                                                       ┃  %s ┃ ┃ \033[31m%-18s\033[0m┃ '%(print_map_name[9],print_map_name[16],id_info_list[0][0]))
     else:
         print('┃  %s ┃                                                       ┃  %s ┃ ┃ %-18s┃ '%(print_map_name[9],print_map_name[16],id_info_list[0][0]))
-    print('┃  %s ┃                                                       ┃  %s ┃ ┃ 전재산%9s 원┃ ' %(print_fee[9],print_fee[16],id_info_list[0][2]))
+    print('┃  %s ┃                                                       ┃  %s ┃ ┃ \033[30m전재산%9s 원\033[0m┃ ' %(print_fee[9],print_fee[16],id_info_list[0][2]))
     print('┃ %s┃                                                       ┃ %s┃ ┃ %15s 원┃ ' %(now_location[9], now_location[16],id_info_list[0][1]))
     print('┗ ━ ━ ━ ━ ━ ━ ┛                                                       ┗ ━ ━ ━ ━ ━ ━ ┛ ┗ ┫ '+color_1+'●'+color_0+'┣ ━ ━ ━ ━ ━ ━ ┛ ')
     print('┏ ┫ 08┣ ━ %s━ ┓                                                       ┏ ┫ 17┣ ━ %s━ ┓ ┏ ┫ 02┣ ━ ━ ━ ━ ━ ━ ┓ '%(now_building[8], now_building[17]))
@@ -867,7 +880,7 @@ def draw_basic_map():
         print('┃  %s ┃                                                       ┃  %s ┃ ┃ \033[31m%-18s\033[0m┃ '%(print_map_name[8],print_map_name[17],id_info_list[1][0]))
     else:
         print('┃  %s ┃                                                       ┃  %s ┃ ┃ %-18s┃ '%(print_map_name[8],print_map_name[17],id_info_list[1][0]))
-    print('┃  %s ┃                                                       ┃  %s ┃ ┃ 전재산%9s 원┃ ' %(print_fee[8],print_fee[17],id_info_list[1][2]))
+    print('┃  %s ┃                                                       ┃  %s ┃ ┃ \033[30m전재산%9s 원\033[0m┃ ' %(print_fee[8],print_fee[17],id_info_list[1][2]))
     print('┃ %s┃                                                       ┃ %s┃ ┃ %15s 원┃ ' %(now_location[8], now_location[17],id_info_list[1][1]))
     print('┗ ━ ━ ━ ━ ━ ━ ┛                                                       ┗ ━ ━ ━ ━ ━ ━ ┛ ┗ ┫ '+color_2+'●'+color_0+'┣ ━ ━ ━ ━ ━ ━ ┛ ')
     print('┏ ┫ 07┣ ━ %s━ ┓                                                       ┏ ┫ 18┣ ━ %s━ ┓ '%(now_building[7], now_building[18]), end='')
@@ -885,7 +898,7 @@ def draw_basic_map():
         print('')
     print('┃  %s ┃                                                       ┃  %s ┃ ' %(print_fee[7],print_fee[18]), end='')
     if login_count > 2:
-        print('┃ 전재산%9s 원┃ ' % id_info_list[2][2])
+        print('┃ \033[30m전재산%9s 원\033[0m┃ ' % id_info_list[2][2])
     else:
         print('')
     print('┃ %s┃                                                       ┃ %s┃ ' %(now_location[7], now_location[18]), end='')
@@ -913,7 +926,7 @@ def draw_basic_map():
         print('')
     print('┃  %s ┃                                                       ┃  %s ┃ ' %(print_fee[6],print_fee[19]), end='')
     if login_count > 3:
-          print('┃ 전재산%9s 원┃ '% id_info_list[3][2])
+          print('┃ \033[30m전재산%9s 원\033[0m┃ '% id_info_list[3][2])
     else:
         print('')
     print('┃ %s┃                                                       ┃ %s┃ ' %(now_location[6], now_location[19]), end='')
@@ -1190,18 +1203,19 @@ def player_move(Dice):
     global player_end_location
     global id_info_list
     global sec
+    global salary
     player_end_location[now_order] = player_start_location[now_order] + Dice
     if player_end_location[now_order] >= 20:
         player_end_location[now_order] -= 20
         if player_end_location[now_order] > 0:
             # 월급지급
             print('===== 월급을 수령했습니다. =====')
-            id_info_list[now_order][1] += 1000
-            id_info_list[now_order][2] += 1000
+            id_info_list[now_order][1] += salary
+            id_info_list[now_order][2] += salary
     elif now_turn > 1 and player_start_location[now_order] == 0:
         print('===== 월급을 수령했습니다. =====')
-        id_info_list[now_order][1] += 1000
-        id_info_list[now_order][2] += 1000
+        id_info_list[now_order][1] += salary
+        id_info_list[now_order][2] += salary
     # 활동로그파일 기록
     player_start_location[now_order] = player_end_location[now_order]
     sec = 15
@@ -1269,7 +1283,8 @@ def rollDice():
     while True:
         print('주사위를 굴리세요')
         time.sleep(0.1)
-        if input_timer(10,'roll'):
+        roll = input_timer(10,'roll')
+        if roll == 1:
             firstDice = random.randrange(1,7) #첫번째 주사위
             secondDice = random.randrange(1,7) #두번째 주사위
             totalDice = firstDice + secondDice #주사위들의 합
@@ -1277,6 +1292,41 @@ def rollDice():
                 print('===== 첫번째 주사위 값: ' + str(firstDice) + ', 두번째 주사위 값: ' + str(secondDice) + ' =====')
                 print('===== 현재 무인도에 있습니다. 이동하지 않습니다. =====')
                 islandPlayer[now_order] = 0
+                time.sleep(1)
+                return 0
+            if firstDice != secondDice:
+                print('===== 첫번째 주사위 값: ' + str(firstDice) + ', 두번째 주사위 값: '+ str(secondDice) + ' =====')
+                print('===== ' + str(totalDice) + '칸 이동합니다. =====')
+                player_move(totalDice)
+                is_double = 0
+                return True
+            else:
+                print('===== 첫번째 주사위 값: ' + str(firstDice) + ', 두번째 주사위 값: '+ str(secondDice) + ' =====')
+                is_double += 1
+                if is_double == 1:
+                    print('===== 첫번째 더블! =====')
+                    print('===== ' + str(totalDice) + '칸 이동합니다. =====')
+                    player_move(totalDice)
+                    return True
+                elif is_double == 2:
+                    print('===== 두번째 더블! =====')
+                    print('===== ' + str(totalDice) + '칸 이동합니다. =====')
+                    player_move(totalDice)
+                    return True
+                elif is_double == 3:
+                    print('===== 세번째 더블! =====')
+                    print('===== 무인도로 이동합니다 =====')
+                    island()
+                    return -1
+        elif roll == 2:
+            firstDice = int(input('첫 주사위 :')) #첫번째 주사위
+            secondDice = int(input('두번째 주사위 :')) #두번째 주사위
+            totalDice = firstDice + secondDice #주사위들의 합         
+            if islandPlayer[now_order] == 1:
+                print('===== 첫번째 주사위 값: ' + str(firstDice) + ', 두번째 주사위 값: ' + str(secondDice) + ' =====')
+                print('===== 현재 무인도에 있습니다. 이동하지 않습니다. =====')
+                islandPlayer[now_order] = 0
+                is_double = 0
                 time.sleep(1)
                 return 0
             if firstDice != secondDice:
@@ -1353,7 +1403,7 @@ def isSuccess():
             return True
     return False
 
-         
+'''       
 id_1 = 'player1'
 id_2 = 'player2'
 id_3 = 'player3'
@@ -1366,7 +1416,7 @@ id_3_info = [id_3,1000,1000,0]
 id_4_info = [id_4,1000,1000,0]
 id_info_list = [id_1_info,id_2_info,id_3_info,id_4_info]
 login_status = True    
-    
+'''
 def main():
     global now_order
     global now_turn
@@ -1374,8 +1424,8 @@ def main():
     global id_info_list
     global sec
     #회원가입/로그인
-    #if menu() == 0:
-    #    return     
+    if menu() == 0:
+        return     
     for i in range(1,12):
 
         now_turn = i
@@ -1389,7 +1439,7 @@ def main():
 
                 sec = 10
                 draw_basic_map()
-                custom_rollDice()
+                rollDice()
                 
                 
                 
