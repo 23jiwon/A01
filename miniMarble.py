@@ -135,6 +135,8 @@ landing_owner = None
 
 global rank_list
 rank_list = []
+global rank_money_list
+rank_money_list = []
 
 global salary
 salary = 10000
@@ -687,6 +689,7 @@ def bankruptcy(dice = 0):
     global player_input
     global rank_list
     global is_double
+    global rank_money_list
     is_double = 0
 
     for i in range(20):
@@ -710,6 +713,7 @@ def bankruptcy(dice = 0):
         print('====== '+id_info_list[now_order][0]+'님 파산하였습니다 =======')
     id_info_list[now_order][3] = 2 
     rank_list.append(id_info_list[now_order][0])
+    rank_money_list.append(id_info_list[now_order][2])
     time.sleep(2)
             
 # 경고, 중도포기
@@ -1359,10 +1363,12 @@ def rollDice():
 def print_rank():
     global rank_list
     global login_count
+    global rank_money_list
     rank_num = 1
     for i in range(login_count-1,-1,-1):
-        print(str(rank_num) + '등 ' + rank_list[i])
-        rank_num += 1
+        print(str(rank_num) + '등 ' + rank_list[i] + '/ 최종재산: ' + str(rank_money_list[i]))
+        if i != 0 and rank_money_list[i] > rank_money_list[i-1]:
+            rank_num += 1
     
 
 def isSuccess():
@@ -1371,22 +1377,30 @@ def isSuccess():
     global madelist_flag
     global login_count
     global rank_list
+    global rank_money_list
     id_count = 0 #이긴 사람 아이디 번호 저장용
     global money_list
     money_list = [0, 0, 0, 0]
     if now_turn > 10:
         print('게임을 종료합니다')
         for i in range(login_count):
-            money_list[i] = id_info_list[i][2]#money_list 만드는중
-        max_money = money_list[0] # 최대 재산을 첫번째 유저 재산으로 초기화
-        for i in money_list:
-            if max_money < i: # 만약 해당 유저 재산이 최대 재산보다 많으면 갱신
-                max_money = i
-                id_success_num = id_count                
-            id_count += 1
+            money_list[i] = id_info_list[i][2]
+            if id_info_list[i][3] == 2:
+                money_list[i] = -1
+        id_success_num = 0
+        for j in range(login_count - money_list.count(-1) + 1):
+            min_money = float("inf")
+            id_count = 0
+            for i in money_list:            
+                if min_money >= i and i != -1: 
+                    min_money = i
+                    id_success_num = id_count                
+                id_count += 1
+            rank_list.append(id_info_list[id_success_num][0])
+            rank_money_list.append(id_info_list[id_success_num][2])
+            money_list[id_success_num] = -1            
         draw_basic_map()
-        print('===== ' + id_info_list[id_success_num][0] + ' 님이 승리하였습니다 ======')
-        rank_list.append(id_info_list[id_success_num][0])
+        print('===== 최종 결과 ======')
         print_rank()
         return True
     elif now_turn <= 10:
@@ -1397,8 +1411,9 @@ def isSuccess():
                 bankruptcy_count += 1
         draw_basic_map()
         if bankruptcy_count == login_count - 1:# 자길 제외하고 다 파산하면 승리
-            print('===== ' + id_info_list[now_order][0] + ' 님이 승리하였습니다 ======')
+            print('===== 최종 결과 ======')
             rank_list.append(id_info_list[now_order][0])
+            rank_money_list.append(id_info_list[id_success_num][2])
             print_rank()
             return True
     return False
