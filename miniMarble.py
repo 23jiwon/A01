@@ -1413,7 +1413,7 @@ def isSuccess():
         if bankruptcy_count == login_count - 1:# 자길 제외하고 다 파산하면 승리
             print('===== 최종 결과 ======')
             rank_list.append(id_info_list[now_order][0])
-            rank_money_list.append(id_info_list[id_success_num][2])
+            rank_money_list.append(id_info_list[now_order][2])
             print_rank()
             return True
     return False
