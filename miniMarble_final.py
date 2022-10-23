@@ -1547,11 +1547,11 @@ def write_map_file():
     f.close()
     
     #### 활동로그
-    global turn_file
-    f2 = open(turn_file, 'a', encoding = 'utf-8')
+#     global turn_file
+#     f2 = open(turn_file, 'a', encoding = 'utf-8')
     
-    f2.write(str(now_turn)+", "+str(now_order)+", "+str(id_info_list[now_order][2])+", "+str(is_double)+", "+str(player_start_location[now_order])+", "+str(player_end_location[now_order])+"\n")
-    f2.close()
+#     f2.write(str(now_turn)+", "+str(now_order)+", "+str(id_info_list[now_order][2])+", "+str(is_double)+", "+str(player_start_location[now_order])+", "+str(player_end_location[now_order])+"\n")
+#     f2.close()
 
 def write_log_file(): #더블 시 
     global turn_file
@@ -1583,7 +1583,7 @@ def main():
                 sec = 10
                 draw_basic_map()
                 rollDice()
-                # write_map_file()
+                write_map_file()
                 
                 
                 #해당 플레이어의 차례 종료
