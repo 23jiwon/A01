@@ -617,14 +617,13 @@ def input_timer(left_time, require_msg):
                     if city_num == -1:
                         city_num = 0
                     print('===== ' + print_map_name[city_num].rstrip()  + '(으)로 이동합니다. =====')
-                    if city_num < 15:
+                    if city_num < 15 and city_num != 0:
                         # 월급지급
                         print('===== 월급을 수령했습니다. =====')
                         id_info_list[now_order][1] += salary
                         id_info_list[now_order][2] += salary
 
-                    player_end_location[now_order] = city_num                    
-                    # 활동로그 기록
+                    player_end_location[now_order] = city_num   
                     player_start_location[now_order] = player_end_location[now_order]
                     time.sleep(1)
                     return city_num
