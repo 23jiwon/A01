@@ -634,7 +634,7 @@ def input_timer(left_time, require_msg):
                         id_info_list[now_order][2] += salary
 
                     player_end_location[now_order] = city_num                    
-                    write_log_file()
+                    #write_log_file()
                     player_start_location[now_order] = player_end_location[now_order]
                     time.sleep(1)
                     return city_num
@@ -1047,7 +1047,7 @@ def trip():
     landing_num = input_timer(15, 'trip')
     draw_basic_map()
     if landing_num != 15:
-
+        write_log_file_trip(15, landing_num)
         action(landing_num)
         
 
@@ -1561,6 +1561,13 @@ def write_log_file(): #더블 시
     f2 = open(turn_file, 'a', encoding = 'utf-8')
     
     f2.write(str(now_turn)+", "+str(now_order)+", "+str(id_info_list[now_order][2])+", "+str(is_double)+", "+str(player_start_location[now_order])+", "+str(player_end_location[now_order])+"\n")
+    f2.close()
+
+def write_log_file_trip(start, end): #여행할 경우 log 기록
+    global turn_file
+    f2 = open(turn_file, 'a', encoding = 'utf-8')
+    
+    f2.write(str(now_turn)+", "+str(now_order)+", "+str(id_info_list[now_order][2])+", "+str(is_double)+", "+str(start)+", "+str(end)+"\n")
     f2.close()
 
 def main():
