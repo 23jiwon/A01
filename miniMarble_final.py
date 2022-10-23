@@ -60,7 +60,7 @@ id_info_list = [id_1_info,id_2_info,id_3_info,id_4_info]
 
 # 6.1.3. 페스티벌 변수
 global now_festival
-now_festival = -1
+# now_festival = -1
 # 6.1.4. 소유주 문자열 배열
 global owner_list
 owner_list = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
@@ -219,7 +219,7 @@ def register():
         a = input("userID > ")
         b = a.split()
         if b[0] == 'id' or b[0] == '아이디' or b[0] == 'i' or b[0] == '아디': 
-            if len(b) >= 2:
+            if len(b) == 2: ##1023 
                 userid = input_id(b[1])
             else:
                 print('[Error]: 회원가입 id 입력 조건에서 벗어납니다. 다시 id를 입력해 주세요.')
@@ -1487,6 +1487,60 @@ def make_log_file():
 
         uniq += 1
 
+    f = open(map_file, 'w', encoding = 'utf-8')
+    f.close()
+    
+    f2 = open(turn_file, 'w', encoding = 'utf-8')
+    f2.write("턴 수, 플레이어 번호, 플레이어의 전 재산, 현재 턴의 더블 횟수, 출발지 번호, 도착지 번호\n")
+    f2.close()
+
+# 로그파일 생성 함수. 게임 시작 시 한번 만 호출
+def make_log_file():
+    #### 맵 파일
+    global map_file
+    map_file = "log-"+str(id_1)+"-map.txt"
+
+    #파일명 중복 검사
+    #input_path = str(os.path.realpath('')) + "\\"
+    filename = "log-"+id_1+"-map"
+    file_ext = ".txt"
+    #print("input_path : " + str(input_path))
+    
+    output_path = str(os.path.realpath('')) + "\\%s%s"
+    output_path = output_path %(filename, file_ext)
+    #print("output_path : " + str(output_path))
+
+    uniq=1
+    while os.path.exists(output_path):
+        output_path = str(os.path.realpath('')) + "\\{name}({num}){ext}"
+        output_path = output_path.format(name = filename, num= uniq, ext = file_ext)
+        map_file = "log-" + str(id_1) + "-map(" + str(uniq) + ").txt"
+        #print("output_path : "+ str(output_path))
+
+        uniq += 1
+        
+        
+    #### 활동로그 파일
+    global turn_file
+    turn_file = "log-"+str(id_1)+"-turn.txt"
+    
+    #파일명 중복 검사
+    filename = "log-"+id_1+"-turn"
+    file_ext = ".txt"
+    
+    output_path = str(os.path.realpath('')) + "\\%s%s"
+    output_path = output_path %(filename, file_ext)
+    #print("output_path : " + str(output_path))
+
+    uniq=1
+    while os.path.exists(output_path):
+        output_path = str(os.path.realpath('')) + "\\{name}({num}){ext}"
+        output_path = output_path.format(name = filename, num= uniq, ext = file_ext)
+        turn_file = "log-" + str(id_1) + "-turn(" + str(uniq) + ").txt"
+        #print("output_path : "+ str(output_path))
+
+        uniq += 1
+
     
     f2 = open(turn_file, 'w', encoding = 'utf-8')
     f2.write("턴 수, 플레이어 번호, 플레이어의 전 재산, 현재 턴의 더블 횟수, 출발지 번호, 도착지 번호\n")
@@ -1511,7 +1565,7 @@ def write_map_file():
         globals()['player_info_{}'.format(i+1)] = [player_id, player_cash, player_property, player_status] # 아이디, 현금, 전재산, 현재상태
         # TODO : 상태 변경 추가해야함
         # if -> player_info_n[3] = 1
-        f.write(str(id_info_list)+"\n")
+        f.write(str(id_info_list[i]))
 
     # 6.1.3 페스티벌 변수
     festival_list = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
@@ -1519,12 +1573,12 @@ def write_map_file():
     f.write("\nfestival list : "+ str(festival_list))
     
     #6.1.4 소유주 문자열 배열
-    owner_list = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    global owner_list
     
     f.write("\nowner_list : "+ str(owner_list))
     
     #6.1.5 랜드마크 문자열 배열
-    landmark_list = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    global landmark_list
     
     f.write("\nlandmark_list : "+ str(landmark_list))
     
@@ -1538,6 +1592,13 @@ def write_map_file():
     f2.write(str(now_turn)+", "+str(now_order)+", "+str(id_info_list[now_order][2])+", "+str(is_double)+", "+str(player_start_location[now_order])+", "+str(player_end_location[now_order])+"\n")
     f2.close()
 
+def write_log_file(): #더블 시 
+    global turn_file
+    f2 = open(turn_file, 'a', encoding = 'utf-8')
+    #TODO : now_order -> 현재 차례의 플레이어 번호 의미하는거 맞음?0~3? or 1~4?
+    
+    f2.write(str(now_turn)+", "+str(now_order)+", "+str(id_info_list[now_order][2])+", "+str(is_double)+", "+str(player_start_location[now_order])+", "+str(player_end_location[now_order])+"\n")
+    f2.close()
 
 def main():
     global now_order
@@ -1562,12 +1623,11 @@ def main():
                 sec = 10
                 draw_basic_map()
                 rollDice()
-                
+                write_log_file()
                 
                 
                 #해당 플레이어의 차례 종료
                 if is_double==0:
-                    write_map_file() #한 차례가 끝나면 로그 기록
                     break
                
                
