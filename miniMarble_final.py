@@ -243,21 +243,25 @@ def register():
                 else:
                     pw_status = True
                     print('비밀번호가 정상 입력되었습니다')
-                    print('현재 비밀번호: ' + userpw)
-                    
+                    print('현재 비밀번호: ' + userpw)        
             elif b[0] == 'select':
-                if id_status == True and pw_status == True:
-                    f = open('member.txt', 'a', encoding = 'utf-8')
-                    f.write(' ' + userid + ' ' + userpw + '\n')
-                    f.close()
-                    print('====== id: ' + userid + ' pw: ' + userpw + ' 회원가입 완료 ======')
-                    print()
-                    return
-                else:
-                    print('[Error]: 아이디와 비밀번호를 정상적으로 입력 후 다시 select를 입력해 주세요')
-                    
+                if len(b) == 1:
+                    if id_status == True and pw_status == True:
+                        f = open('member.txt', 'a', encoding = 'utf-8')
+                        f.write(' ' + userid + ' ' + userpw + '\n')
+                        f.close()
+                        print('====== id: ' + userid + ' pw: ' + userpw + ' 회원가입 완료 ======')
+                        print()
+                        return
+                    else:
+                        print('[Error]: 아이디와 비밀번호를 정상적으로 입력 후 다시 입력해 주세요')
+                else: 
+                    print('[Error]: 불필요한 인자가 입력되었습니다. 다시 입력해 주세요.')    
             elif b[0] == 'back' or b[0] == '뒤로가기' or b[0] == 'b' or b[0] == 'ㄷㄹㄱㄱ':
-                return
+                if len(b) == 1:
+                    return
+                else: 
+                    print('[Error]: 불필요한 인자가 입력되었습니다. 다시 입력해 주세요.')
             else:
                 print('[Error]: 명령어를 잘못 입력하셨습니다. 다시 입력해 주세요.')
                 
@@ -344,7 +348,6 @@ def login():
     a = input('userID > ')
     if a == 'back' or a == '뒤로가기' or a == 'b' or a == 'ㄷㄹㄱㄱ':
         return
-    z = a[0]
     
     while not (len(a) == 1 and ord(z) >= 50 and ord(z) <= 52):
         print('[Error]: 인자에 숫자 이외의 글자 혹은 2~4를 제외한 숫자를 입력했습니다. 숫자를 입력해주세요.')
@@ -352,6 +355,8 @@ def login():
         print('게임에 참가할 인원수를 입력해주세요.')
         a = input('userID > ')
         z = a[0]
+    
+    z = a[0]
 
     print(a + '명의 id와 pw를 입력받습니다. (입력형식: login <아이디> <비밀번호>)')
 
