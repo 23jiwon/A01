@@ -488,7 +488,7 @@ def judge_own_city_name(city_name):
     global player_input
     try:
         city_num = int(city_name)
-        if city_num <= 0 or city_num > 20 or city_num == 5 or city_num == 10 or city_num == 15 or float(city_name) - city_num != 0:
+        if city_num <= 0 or city_num >= 20 or city_num == 5 or city_num == 10 or city_num == 15 or float(city_name) - city_num != 0:
             print('[Error]: 유효하지 않은 도시번호입니다. 특수지역을 제외한 0이상 19이하의 정수를 입력해주세요.')
             player_input=[None]
             return False
@@ -524,7 +524,7 @@ def judge_city_name(city_name):
     global player_input
     try:
         city_num = int(city_name)
-        if city_num < 0 or city_num > 20 or float(city_name) - city_num != 0:
+        if city_num < 0 or city_num >= 20 or float(city_name) - city_num != 0:
             print('[Error]: 유효하지 않은 도시번호입니다. 0이상 19이하의 정수를 입력해주세요.')
             player_input=[None]
             return False
