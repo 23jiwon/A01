@@ -285,7 +285,7 @@ def input_id(i):
                 print('[Error]: 회원가입 id 입력 조건에서 벗어납니다. 다시 id를 입력해 주세요.')
                 return '0'
     else:
-        print('[Error]: 회원가입 id 입력 조건에서 벗어납니다. id 길이가 짧습니다. 다시 id를 입력해 주세요.')
+        print('[Error]: 회원가입 id 입력 조건에서 벗어납니다. 다시 id를 입력해 주세요.')
         return '0'
     
     with open('member.txt') as file:
