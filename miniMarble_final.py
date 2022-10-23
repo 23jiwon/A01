@@ -217,53 +217,56 @@ def register():
     
     while select_status == False:
         a = input("userID > ")
-        b = a.split()
-        if b[0] == 'id' or b[0] == '아이디' or b[0] == 'i' or b[0] == '아디': 
-            if len(b) == 2: ##1023 
-                userid = input_id(b[1])
-            else:
-                print('[Error]: 회원가입 id 입력 조건에서 벗어납니다. 다시 id를 입력해 주세요.')
-                continue
-            if userid == '0':
-                id_status = False
-            else:
-                id_status = True
-                print('아이디가 정상 입력되었습니다')
-                print('현재 아이디: ' + userid)
-                
-        elif b[0] == 'pw' or b[0] == '비밀번호' or b[0] == 'p' or b[0] =='비번':
-            if len(b) >= 2:
-                userpw = input_pw(b[1])
-            else:
-                print('[Error]: 회원가입 pw 입력 조건에서 벗어납니다. 다시 pw를 입력해 주세요.')
-                continue
-            if userpw == '0':
-                pw_status = False
-            else:
-                pw_status = True
-                print('비밀번호가 정상 입력되었습니다')
-                print('현재 비밀번호: ' + userpw)
-                
-        elif b[0] == 'select':
-            if id_status == True and pw_status == True:
-                f = open('member.txt', 'a', encoding = 'utf-8')
-                f.write(' ' + userid + ' ' + userpw + '\n')
-                f.close()
-                print('====== id: ' + userid + ' pw: ' + userpw + ' 회원가입 완료 ======')
-                print()
+        if a != '':
+            b = a.split()
+            if b[0] == 'id' or b[0] == '아이디' or b[0] == 'i' or b[0] == '아디': 
+                if len(b) == 2: ##1023 
+                    userid = input_id(b[1])
+                else:
+                    print('[Error]: 회원가입 id 입력 조건에서 벗어납니다. 다시 id를 입력해 주세요.')
+                    continue
+                if userid == '0':
+                    id_status = False
+                else:
+                    id_status = True
+                    print('아이디가 정상 입력되었습니다')
+                    print('현재 아이디: ' + userid)
+                    
+            elif b[0] == 'pw' or b[0] == '비밀번호' or b[0] == 'p' or b[0] =='비번':
+                if len(b) >= 2:
+                    userpw = input_pw(b[1])
+                else:
+                    print('[Error]: 회원가입 pw 입력 조건에서 벗어납니다. 다시 pw를 입력해 주세요.')
+                    continue
+                if userpw == '0':
+                    pw_status = False
+                else:
+                    pw_status = True
+                    print('비밀번호가 정상 입력되었습니다')
+                    print('현재 비밀번호: ' + userpw)
+                    
+            elif b[0] == 'select':
+                if id_status == True and pw_status == True:
+                    f = open('member.txt', 'a', encoding = 'utf-8')
+                    f.write(' ' + userid + ' ' + userpw + '\n')
+                    f.close()
+                    print('====== id: ' + userid + ' pw: ' + userpw + ' 회원가입 완료 ======')
+                    print()
+                    return
+                else:
+                    print('[Error]: 아이디와 비밀번호를 정상적으로 입력 후 다시 select를 입력해 주세요')
+                    
+            elif b[0] == 'back' or b[0] == '뒤로가기' or b[0] == 'b' or b[0] == 'ㄷㄹㄱㄱ':
                 return
             else:
-                print('[Error]: 아이디와 비밀번호를 정상적으로 입력 후 다시 select를 입력해 주세요')
+                print('[Error]: 명령어를 잘못 입력하셨습니다. 다시 입력해 주세요.')
                 
-        elif b[0] == 'back' or b[0] == '뒤로가기' or b[0] == 'b' or b[0] == 'ㄷㄹㄱㄱ':
-            return
+            if id_status == True and pw_status == True and (b[0] == 'id' or b[0] == 'pw'):
+                print('아이디와 비밀번호가 정상적으로 입력되었습니다')
+                print('이대로 결정하시려면 select를 입력해 주세요')
+                print('만약 아이디와 비밀번호를 변경하고 싶다면 다시 id, pw 명령어를 사용해 주세요')
         else:
-            print('[Error]: 명령어를 잘못 입력하셨습니다. 다시 입력해 주세요.')
-            
-        if id_status == True and pw_status == True and (b[0] == 'id' or b[0] == 'pw'):
-            print('아이디와 비밀번호가 정상적으로 입력되었습니다')
-            print('이대로 결정하시려면 select를 입력해 주세요')
-            print('만약 아이디와 비밀번호를 변경하고 싶다면 다시 id, pw 명령어를 사용해 주세요')
+            print('[Error] 잘못된 입력입니다. 다시 입력해 주세요.')
 
     
         
