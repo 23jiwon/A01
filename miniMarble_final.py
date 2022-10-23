@@ -440,6 +440,11 @@ def login():
     id_3_info = [id_3,10000,10000,0]
     id_4_info = [id_4,10000,10000,0]
     id_info_list = [id_1_info,id_2_info,id_3_info,id_4_info]
+    for i in range(4):
+        if login_count-1 < i:
+            id_info_list[i][3] = 2
+            id_info_list[i][2] = float("inf")
+            id_info_list[i][1] = float("inf")
     login_status = True
     return
 
@@ -1400,26 +1405,23 @@ def isSuccess():
     global rank_money_list
     id_count = 0 #이긴 사람 아이디 번호 저장용
     global money_list
-    money_list = [0, 0, 0, 0]
+    money_list = []
     if now_turn > 10:
-        print('게임을 종료합니다')
+        now_turn = 10
         for i in range(login_count):
-            money_list[i] = id_info_list[i][2]
             if id_info_list[i][3] == 2:
-                money_list[i] = -1
+                money_list.append(float("inf"))
+            else:
+                money_list.append(id_info_list[i][2])
         id_success_num = 0
-        for j in range(login_count - money_list.count(-1) + 1):
-            min_money = float("inf")
-            id_count = 0
-            for i in money_list:            
-                if min_money >= i and i != -1: 
-                    min_money = i
-                    id_success_num = id_count                
-                id_count += 1
+        print(money_list)
+        for j in range(login_count - money_list.count(float("inf"))):
+            id_success_num = money_list.index(min(money_list))
             rank_list.append(id_info_list[id_success_num][0])
             rank_money_list.append(id_info_list[id_success_num][2])
-            money_list[id_success_num] = -1            
+            money_list[id_success_num] = float("inf")            
         draw_basic_map()
+        print('게임을 종료합니다.')
         print('===== 최종 결과 ======')
         print_rank()
         return True
@@ -1429,8 +1431,9 @@ def isSuccess():
         for i in range(login_count):
             if id_info_list[i][3] == 2:
                 bankruptcy_count += 1
-        draw_basic_map()
-        if bankruptcy_count == login_count - 1:# 자길 제외하고 다 파산하면 승리
+        if bankruptcy_count == login_count - 1:# 자길 제외하고 다 파산하면 승리 
+            draw_basic_map()
+            print('게임을 종료합니다.')
             print('===== 최종 결과 ======')
             rank_list.append(id_info_list[now_order][0])
             rank_money_list.append(id_info_list[now_order][2])
