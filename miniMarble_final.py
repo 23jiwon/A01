@@ -243,7 +243,7 @@ def register():
                 else:
                     pw_status = True
                     print('비밀번호가 정상 입력되었습니다')
-                    print('현재 비밀번호: ' + userpw)        
+                    print('현재 비밀번호: ' + userpw)
             elif b[0] == 'select':
                 if len(b) == 1:
                     if id_status == True and pw_status == True:
@@ -257,6 +257,7 @@ def register():
                         print('[Error]: 아이디와 비밀번호를 정상적으로 입력 후 다시 입력해 주세요')
                 else: 
                     print('[Error]: 불필요한 인자가 입력되었습니다. 다시 입력해 주세요.')    
+                    
             elif b[0] == 'back' or b[0] == '뒤로가기' or b[0] == 'b' or b[0] == 'ㄷㄹㄱㄱ':
                 if len(b) == 1:
                     return
@@ -348,16 +349,16 @@ def login():
     a = input('userID > ')
     if a == 'back' or a == '뒤로가기' or a == 'b' or a == 'ㄷㄹㄱㄱ':
         return
-    
+
     while not (len(a) == 1 and ord(z) >= 50 and ord(z) <= 52):
         print('[Error]: 인자에 숫자 이외의 글자 혹은 2~4를 제외한 숫자를 입력했습니다. 숫자를 입력해주세요.')
         print()
         print('게임에 참가할 인원수를 입력해주세요.')
         a = input('userID > ')
         z = a[0]
-    
+            
     z = a[0]
-
+    
     print(a + '명의 id와 pw를 입력받습니다. (입력형식: login <아이디> <비밀번호>)')
 
     while True:
@@ -623,7 +624,8 @@ def input_timer(left_time, require_msg):
                         id_info_list[now_order][1] += salary
                         id_info_list[now_order][2] += salary
 
-                    player_end_location[now_order] = city_num   
+                    player_end_location[now_order] = city_num                    
+                    write_log_file()
                     player_start_location[now_order] = player_end_location[now_order]
                     time.sleep(1)
                     return city_num
@@ -1005,7 +1007,7 @@ def island():
     islandPlayer[now_order] = 1
     if is_double == 3:
         player_end_location[now_order] = 5
-        # 활동로그파일 기록
+        write_log_file()
         player_start_location[now_order] = player_end_location[now_order]
     is_double = 0
 
@@ -1031,7 +1033,7 @@ def festival():
         return
         
 # 공항 함수
-def trip():        
+def trip():
     print('>> trip?')
     landing_num = input_timer(15, 'trip')
     draw_basic_map()
@@ -1234,7 +1236,7 @@ def player_move(Dice):
         print('===== 월급을 수령했습니다. =====')
         id_info_list[now_order][1] += salary
         id_info_list[now_order][2] += salary
-    # 활동로그파일 기록
+    # write_log_file()
     player_start_location[now_order] = player_end_location[now_order]
     sec = 15
     time.sleep(1)
