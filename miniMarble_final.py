@@ -349,15 +349,17 @@ def login():
     a = input('userID > ')
     if a == 'back' or a == '뒤로가기' or a == 'b' or a == 'ㄷㄹㄱㄱ':
         return
-
+    
+    if a !='':
+        z = a[0]
+    
     while not (len(a) == 1 and ord(z) >= 50 and ord(z) <= 52):
         print('[Error]: 인자에 숫자 이외의 글자 혹은 2~4를 제외한 숫자를 입력했습니다. 숫자를 입력해주세요.')
         print()
         print('게임에 참가할 인원수를 입력해주세요.')
         a = input('userID > ')
-        z = a[0]
-            
-    z = a[0]
+        if a !='':
+            z = a[0]
     
     print(a + '명의 id와 pw를 입력받습니다. (입력형식: login <아이디> <비밀번호>)')
 
@@ -1527,9 +1529,8 @@ def write_map_file():
         f.write(str(id_info_list[i]))
 
     # 6.1.3 페스티벌 변수
-    festival_list = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    festival_list[now_festival] = 1 #now_festival : 전역변수
-    f.write("\nfestival list : "+ str(festival_list))
+    global now_festival
+    f.write("\nfestival : "+ str(now_festival))
     
     #6.1.4 소유주 문자열 배열
     global owner_list
