@@ -502,6 +502,7 @@ def judge_own_city_name(city_name):
         for i in range(20):
             if city_name == default_map_name[i]:
                 if owner_list[i] != id_list[now_order]: 
+                    print('===== ' + default_map_name[] + ' 도시를 보유하고 있지 않습니다! =====')
                     return False
                 else:
                     return i
