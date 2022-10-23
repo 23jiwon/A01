@@ -1240,7 +1240,7 @@ def player_move(Dice):
         print('===== 월급을 수령했습니다. =====')
         id_info_list[now_order][1] += salary
         id_info_list[now_order][2] += salary
-    # write_log_file()
+    write_log_file()
     player_start_location[now_order] = player_end_location[now_order]
     sec = 15
     time.sleep(1)
@@ -1583,7 +1583,7 @@ def main():
                 sec = 10
                 draw_basic_map()
                 rollDice()
-                write_map_file()
+                # write_map_file()
                 
                 
                 #해당 플레이어의 차례 종료
