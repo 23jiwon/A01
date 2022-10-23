@@ -329,6 +329,7 @@ def login():
     global login_count
     global login_status
     
+    login_count = 0
     login_status = False
     print('게임에 참가할 인원수를 입력해주세요. 게임은 2~4인이 함께 즐길 수 있습니다.')
     a = input('userID > ')
