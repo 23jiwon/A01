@@ -345,8 +345,37 @@ def login():
     
     login_count = 0
     login_status = False
-    print('게임에 참가할 인원수를 입력해주세요. 게임은 2~4인이 함께 즐길 수 있습니다.')
-    a = input('userID > ')
+    
+    map_bool = False
+    
+    while(True):
+        print('기본 도시명 배열을 선택하려면 1 혹은 기본, 커스텀 도시명 배열을 선택하려면 2 혹은 커스텀을 입력해 주세요.')
+        a = input()
+        if a == '1' or a =='기본':
+            map_bool = True
+            break
+        elif a == '2' or a == '커스텀':
+            map_bool = False
+            break
+        else:
+            print('입력이 올바르지 않습니다. 다시 입력해 주세요.')
+            
+    ckcm = check_custom_map()
+    if ckcm == True:
+        uc = unique_city()
+        if uc == True:
+            print('커스텀 맵이 정상적으로 적용되었습니다.)
+        else:
+            print('커스텀 맵이 올바르지 않습니다. 메인 메뉴로 돌아갑니다.')
+            time.sleep(3)
+            return
+    else:
+        print('커스텀 맵이 올바르지 않습니다. 메인 메뉴로 돌아갑니다.')
+        time.sleep(3)
+        return
+        
+        print('게임에 참가할 인원수를 입력해주세요. 게임은 2~4인이 함께 즐길 수 있습니다.')
+        a = input('userID > ')
     if a == 'back' or a == '뒤로가기' or a == 'b' or a == 'ㄷㄹㄱㄱ':
         return
     
@@ -1219,7 +1248,7 @@ def action(landing_num):
                 bankruptcy()                
 
         elif owner_list[landing_num] == id_info_list[now_order][0]:
-            print('===== 내 도시라 편안해요~ =====')
+            #print('===== 내 도시라 편안해요~ =====')
             time.sleep(1)
             
 

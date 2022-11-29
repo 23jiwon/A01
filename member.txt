@@ -1,3 +1,4 @@
- test01 password
- test02 password
- test03 password
+ player1 player1pw 
+ player2 player2pw 
+ player3 player3pw 
+ player4 player4pw 
