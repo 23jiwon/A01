@@ -364,7 +364,7 @@ def login():
     if ckcm == True:
         uc = unique_city()
         if uc == True:
-            print('커스텀 맵이 정상적으로 적용되었습니다.)
+            print('커스텀 맵이 정상적으로 적용되었습니다.')
         else:
             print('커스텀 맵이 올바르지 않습니다. 메인 메뉴로 돌아갑니다.')
             time.sleep(3)
