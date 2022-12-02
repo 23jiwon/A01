@@ -139,7 +139,7 @@ global rank_money_list
 rank_money_list = []
 
 global salary
-salary = 10000
+salary = 2000
 
 # 로그파일명(기획서 6장)
 global map_file
@@ -435,10 +435,10 @@ def login():
     print('===== 유저 ' + str(login_count) + '명 로그인 완료 ======')
     print()    
     id_list = [id_1, id_2, id_3, id_4]
-    id_1_info = [id_1,10000,10000,0]
-    id_2_info = [id_2,10000,10000,0]
-    id_3_info = [id_3,10000,10000,0]
-    id_4_info = [id_4,10000,10000,0]
+    id_1_info = [id_1,2000,2000,0]
+    id_2_info = [id_2,2000,2000,0]
+    id_3_info = [id_3,2000,2000,0]
+    id_4_info = [id_4,2000,2000,0]
     id_info_list = [id_1_info,id_2_info,id_3_info,id_4_info]
     for i in range(4):
         if login_count-1 < i:
@@ -591,10 +591,10 @@ def input_timer(left_time, require_msg):
             b_res = 0
             if re.search(' ' , player_input[0]) != None:
                 b_res = 1
-            if(player_input[0].isspace() or player_input[0]==''): 
+            if(player_input[0].isspace() or player_input[0]=='' and require_msg not in ['build', 'takeover']): 
                 # 입력에 공백만 있다면
                 print('[Error]: 인자의 개수가 적습니다. 1개의 인자를 입력해주세요.')
-            elif(b_res):
+            elif(b_res and require_msg not in ['festival', 'trip']):
                 #문자열 사이에 공백이 있다면
                 print('[Error]: 인자의 개수가 많습니다. 1개의 인자를 입력해주세요.')
             if require_msg == 'roll':
@@ -611,7 +611,7 @@ def input_timer(left_time, require_msg):
                     time.sleep(1)
                     return True
                 else:
-                    print('[Error]:축제를 개최할 도시명 또는 도시번호를 입력하세요.')
+                    print('[Error]: 축제를 개최할 도시명 또는 도시번호를 입력하세요.')
 
                     player_input=[None]
                     i_timer= threading.Thread(target=get_player_input, args=(player_input,))
@@ -639,7 +639,7 @@ def input_timer(left_time, require_msg):
                     time.sleep(1)
                     return city_num
                 else:
-                    print('[Error]:여행갈 도시명 또는 도시번호를 입력하세요.')
+                    print('[Error]: 여행갈 도시명 또는 도시번호를 입력하세요.')
 
                     player_input=[None]
                     i_timer= threading.Thread(target=get_player_input, args=(player_input,))
@@ -651,7 +651,7 @@ def input_timer(left_time, require_msg):
                 elif input_check('no', player_input[0]):
                     return 3
                 else:
-                    print('[Error]:yes 또는 no를 입력하세요')
+                    print('[Error]: yes 또는 no를 입력하세요')
                     player_input=[None]
                     i_timer= threading.Thread(target=get_player_input, args=(player_input,))
                     i_timer.daemon = True
