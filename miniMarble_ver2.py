@@ -1007,6 +1007,26 @@ def landMark():
 
     time.sleep(1)
 
+#다른 랜드마크 함수
+def my_landMark(isto, landing_num):
+    global landmark_list
+    global id_info_list
+    global now_order
+    global trading_fee
+
+    if(isto == 1):
+        landmark_list[landing_num] = 1
+        id_info_list[now_order][2]+=trading_fee[landing_num]
+    
+    elif(isto == 0):
+        if(landmark_list[landing_num]==0):
+            landmark_list[landing_num] = 1
+            id_info_list[now_order][2]+=trading_fee[landing_num]
+        else:
+             #print('이미 랜드마크!')
+    
+    time.sleep(1)
+    
 # 무인도
 def island():
     global now_order
@@ -1096,6 +1116,8 @@ def takeover(landing_num,landing_owner):
             # 인수 진행 액션 코드
             owner_list[landing_num] = id_info_list[now_order][0]
             id_info_list[now_order][2] += trading_fee[landing_num]
+            my_landMark(1, landing_num)
+            
         elif takeover_flag == 3:
             print("====== 인수를 포기합니다 ======")
             # 건설 포기 액션 코드
@@ -1219,6 +1241,7 @@ def action(landing_num):
                 bankruptcy()                
 
         elif owner_list[landing_num] == id_info_list[now_order][0]:
+            my_landMark(0, landing_num)
             #print('===== 내 도시라 편안해요~ =====')
             time.sleep(1)
             
