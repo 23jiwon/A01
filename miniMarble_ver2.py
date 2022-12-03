@@ -1429,7 +1429,10 @@ def isSuccess():
     id_count = 0 #이긴 사람 아이디 번호 저장용
     global money_list
     money_list = []
-    if now_turn > 10:
+    
+    if line_win(now_order): # 라인 독점한 경우 즉시 승리
+        return True
+    elif now_turn > 10:
         now_turn = 10
         for i in range(login_count):
             if id_info_list[i][3] == 2:
@@ -1593,6 +1596,49 @@ def write_log_file_trip(start, end): #여행할 경우 log 기록
     f2.write(str(now_turn)+", "+str(now_order)+", "+str(id_info_list[now_order][2])+", "+str(is_double)+", "+str(start)+", "+str(end)+"\n")
     f2.close()
 
+# 라인 독점 함수 -> build, takeover에서 호출
+def line_win(now_order):
+    global rank_list
+    global owner_list
+    global id_info_list
+    global money_list
+    global rank_money_list
+    global id_count
+    global now_turn
+    
+    if (id_info_list[now_order][0] == owner_list[1] == owner_list[2] == owner_list[3] == owner_list[4]) or \
+    (id_info_list[now_order][0] == owner_list[6] == owner_list[7] == owner_list[8] == owner_list[9]) or \
+    (id_info_list[now_order][0] == owner_list[11] == owner_list[12] == owner_list[13] == owner_list[14]) or \
+    (id_info_list[now_order][0] == owner_list[16] == owner_list[17] == owner_list[18] == owner_list[19]):
+        
+        print("라인 독점 성공")
+        for i in range(login_count):
+            if id_info_list[i][3] == 2:
+                money_list.append(float("inf"))
+            else:
+                money_list.append(id_info_list[i][2])
+                
+        check_id_num = 0 # 추가 수정
+        
+        for j in range(login_count - money_list.count(float("inf"))):
+            check_id_num = money_list.index(min(money_list))
+            rank_list.append(id_info_list[check_id_num][0])
+            rank_money_list.append(id_info_list[check_id_num][2])
+            money_list[check_id_num] = float("inf")            
+                
+        draw_basic_map()
+        
+        print('게임을 종료합니다.')
+        print('===== 최종 결과 ======')
+       
+        print_rank()
+        
+        return True
+    
+    else:
+        #print("라인 독점 실패")
+        return False    
+    
 def main():
     global now_order
     global now_turn
