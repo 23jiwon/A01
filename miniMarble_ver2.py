@@ -476,10 +476,10 @@ def login():
     print('===== 유저 ' + str(login_count) + '명 로그인 완료 ======')
     print()    
     id_list = [id_1, id_2, id_3, id_4]
-    id_1_info = [id_1,10000,10000,0]
-    id_2_info = [id_2,10000,10000,0]
-    id_3_info = [id_3,10000,10000,0]
-    id_4_info = [id_4,10000,10000,0]
+    id_1_info = [id_1,2000,2000,0]
+    id_2_info = [id_2,2000,2000,0]
+    id_3_info = [id_3,2000,2000,0]
+    id_4_info = [id_4,2000,2000,0]
     id_info_list = [id_1_info,id_2_info,id_3_info,id_4_info]
     for i in range(4):
         if login_count-1 < i:
