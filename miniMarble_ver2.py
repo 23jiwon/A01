@@ -23,6 +23,8 @@ global sec
 sec = 15
 
 # 'map.txt'에서 불러온 배열
+global custom_map_txt
+global custom_map_name
 
 # 5.2.2. 맵 배열
 global default_map_name
@@ -342,9 +344,41 @@ def login():
     global id_list
     global login_count
     global login_status
+    global custom_map_name    
     
     login_count = 0
     login_status = False
+    
+    map_bool = False
+    
+    while(True):
+        print('기본 도시명 배열을 선택하려면 1 혹은 기본, 커스텀 도시명 배열을 선택하려면 2 혹은 커스텀을 입력해 주세요.')
+        a = input()
+        if a == '1' or a =='기본':
+            map_bool = True
+            break
+        elif a == '2' or a == '커스텀':
+            map_bool = False
+            break
+        else:
+            print('입력이 올바르지 않습니다. 다시 입력해 주세요.')
+            
+    ckcm = check_custom_map()
+    print(custom_map_name)
+    
+    if ckcm == True:
+        uc = unique_city(custom_map_name)
+        if uc == True:
+            print('커스텀 맵이 정상적으로 적용되었습니다.')
+        else:
+            print('커스텀 맵이 올바르지 않습니다. 메인 메뉴로 돌아갑니다.')
+            time.sleep(3)
+            return
+    else:
+        print('커스텀 맵이 올바르지 않습니다. 메인 메뉴로 돌아갑니다.')
+        time.sleep(3)
+        return
+        
     print('게임에 참가할 인원수를 입력해주세요. 게임은 2~4인이 함께 즐길 수 있습니다.')
     a = input('userID > ')
     if a == 'back' or a == '뒤로가기' or a == 'b' or a == 'ㄷㄹㄱㄱ':
@@ -447,6 +481,56 @@ def login():
             id_info_list[i][1] = float("inf")
     login_status = True
     return
+
+#커스텀 맵
+def check_custom_map():
+    global custom_map_name
+    
+    textfile = open("map.txt",'r', encoding='UTF8')
+    custom_map_txt = textfile.read()
+    custom_map_name = custom_map_txt.split(',')
+    while '' in custom_map_name:
+        del custom_map_name[custom_map_name.index('')]
+
+    for city in custom_map_name:
+        if city in ['start', 'island', 'festival', 'airport']:
+            print('[Error]:',city,'이 특수지역 명과 중복됩니다.')
+            return False
+        if len(city) < 1 or len(city) > 10:
+            print('[Error]:',city,'이 길이 조건을 충족하지 않습니다.')
+            return False
+        for element in city:
+            e = ord(element)
+            if e >= 48 and e <= 57: #0~9 사이의 정수
+                continue
+            elif e >= 65 and e <= 90: #영어 대문자
+                continue
+            elif e >= 97 and e <= 122: #영어 소문자
+                continue
+            elif e >= 44032 and e <= 55203: #한글 조함
+                continue
+            elif e >= 12593 and e <= 12686: #한글 자모
+                continue
+            elif e == 32: #공백
+                continue
+            else:
+                print('[Error]:',element,'이 커스텀 맵 입력 조건에서 벗어납니다.')
+                return False
+    print(custom_map_name)
+    return True
+    
+#커스텀 맵 중복검사
+def unique_city(custom_map_name):
+    #global custom_map_name
+    if len(custom_map_name) != len(set(custom_map_name)):
+        print('[Error]: 중복되는 도시명이 있습니다.')
+        return False
+    elif len(custom_map_name)!=16:
+        print('[Error]: 도시명 개수가',16-len(custom_map_name),'개 부족합니다.')
+        return False
+    else:
+        return True
+    
 
 
 # ============================================================================================================
@@ -1219,7 +1303,7 @@ def action(landing_num):
                 bankruptcy()                
 
         elif owner_list[landing_num] == id_info_list[now_order][0]:
-            print('===== 내 도시라 편안해요~ =====')
+            #print('===== 내 도시라 편안해요~ =====')
             time.sleep(1)
             
 
