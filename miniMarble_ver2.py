@@ -1733,7 +1733,6 @@ def line_win(now_order):
     global id_info_list
     global money_list
     global rank_money_list
-    global id_count
     global now_turn
     
     if (id_info_list[now_order][0] == owner_list[1] == owner_list[2] == owner_list[3] == owner_list[4]) or \
