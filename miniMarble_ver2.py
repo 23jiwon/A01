@@ -353,32 +353,33 @@ def login():
     map_bool = False
     
     while(True):
-        print('기본 도시명 배열을 선택하려면 1 혹은 기본, 커스텀 도시명 배열을 선택하려면 2 혹은 커스텀을 입력해 주세요.')
+        print('기본 도시명 배열을 선택하려면 1, 커스텀 도시명 배열을 선택하려면 2를 입력해 주세요.')
         a = input()
-        if a == '1' or a =='기본':
-            map_bool = True
-            break
-        elif a == '2' or a == '커스텀':
+        if a == '1':
             map_bool = False
+            break
+        elif a == '2':
+            map_bool = True
             break
         else:
             print('입력이 올바르지 않습니다. 다시 입력해 주세요.')
-            
-    ckcm = check_custom_map()
-    print(custom_map_name)
     
-    if ckcm == True:
-        uc = unique_city(custom_map_name)
-        if uc == True:
-            print('커스텀 맵이 정상적으로 적용되었습니다.')
+    if map_bool:
+        ckcm = check_custom_map()
+        print(custom_map_name)
+    
+        if ckcm == True:
+            uc = unique_city(custom_map_name)
+            if uc == True:
+                print('커스텀 맵이 정상적으로 적용되었습니다.')
+            else:
+                print('커스텀 맵이 올바르지 않습니다. 메인 메뉴로 돌아갑니다.')
+                time.sleep(3)
+                return
         else:
             print('커스텀 맵이 올바르지 않습니다. 메인 메뉴로 돌아갑니다.')
             time.sleep(3)
             return
-    else:
-        print('커스텀 맵이 올바르지 않습니다. 메인 메뉴로 돌아갑니다.')
-        time.sleep(3)
-        return
         
     print('게임에 참가할 인원수를 입력해주세요. 게임은 2~4인이 함께 즐길 수 있습니다.')
     a = input('userID > ')
@@ -1107,9 +1108,7 @@ def my_landMark(isto, landing_num):
         if(landmark_list[landing_num]==0):
             landmark_list[landing_num] = 1
             id_info_list[now_order][2]+=trading_fee[landing_num]
-        else:
-             #print('이미 랜드마크!')
-    
+
     time.sleep(1)
     
 # 무인도
