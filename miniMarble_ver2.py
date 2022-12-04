@@ -501,8 +501,6 @@ def check_custom_map():
         if len(city) < 1 or len(city) > 10:
             print('[Error]:',city,'이 길이 조건을 충족하지 않습니다.')
             return False
-        if city >= 0 or city <=19:
-            return False
         for element in city:
             e = ord(element)
             if e >= 48 and e <= 57: #0~9 사이의 정수
