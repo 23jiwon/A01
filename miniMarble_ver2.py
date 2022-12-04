@@ -1742,6 +1742,7 @@ def line_win(now_order):
     (id_info_list[now_order][0] == owner_list[16] == owner_list[17] == owner_list[18] == owner_list[19]):
         
         print("라인 독점 성공")
+        time.sleep(3)
         for i in range(login_count):
             if id_info_list[i][3] == 2:
                 money_list.append(float("inf"))
