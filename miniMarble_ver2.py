@@ -148,6 +148,10 @@ salary = 2000
 global map_file
 global turn_file
 
+# False면 default맵, True면 custom맵
+global map_bool
+map_bool = False
+
 # ============================================================================================================
 # 
 #                              게임 시작 부분 / 회원가입 / 로그인 / 그만두기
@@ -346,6 +350,7 @@ def login():
     global login_count
     global login_status
     global custom_map_name    
+    global map_bool
     
     login_count = 0
     login_status = False
@@ -1093,21 +1098,62 @@ def landMark():
 
     time.sleep(1)
 
-#다른 랜드마크 함수
+# 다른 랜드마크 함수
 def my_landMark(isto, landing_num):
     global landmark_list
     global id_info_list
     global now_order
     global trading_fee
+    global custom_map_name
+    global map_bool
 
     if(isto == 1):
         landmark_list[landing_num] = 1
         id_info_list[now_order][2]+=trading_fee[landing_num]
+        if map_bool:
+            match landing_num:
+                case 1 | 2 | 3 | 4:
+                    print("===== " + custom_map_name[landing_num - 1] + " 도시가 랜드마크로 건설되었습니다! =====")
+                case 6 | 7 | 8 | 9:
+                    print("===== " + custom_map_name[landing_num - 2] + " 도시가 랜드마크로 건설되었습니다! =====")
+                case 11 | 12 | 13 | 14:
+                    print("===== " + custom_map_name[landing_num - 3] + " 도시가 랜드마크로 건설되었습니다! =====")
+                case 16 | 17 | 18 | 19:
+                    print("===== " + custom_map_name[landing_num - 4] + " 도시가 랜드마크로 건설되었습니다! =====")
+        else:
+            print("===== " + default_map_name[landing_num] + " 도시가 랜드마크로 건설되었습니다! =====")
+                
     
     elif(isto == 0):
         if(landmark_list[landing_num]==0):
             landmark_list[landing_num] = 1
             id_info_list[now_order][2]+=trading_fee[landing_num]
+            if map_bool:
+                match landing_num:
+                    case 1 | 2 | 3 | 4:
+                        print("===== " + custom_map_name[landing_num - 1] + " 도시가 랜드마크로 건설되었습니다! =====")
+                    case 6 | 7 | 8 | 9:
+                        print("===== " + custom_map_name[landing_num - 2] + " 도시가 랜드마크로 건설되었습니다! =====")
+                    case 11 | 12 | 13 | 14:
+                        print("===== " + custom_map_name[landing_num - 3] + " 도시가 랜드마크로 건설되었습니다! =====")
+                    case 16 | 17 | 18 | 19:
+                        print("===== " + custom_map_name[landing_num - 4] + " 도시가 랜드마크로 건설되었습니다! =====")
+            else:
+                print("===== " + default_map_name[landing_num] + " 도시가 랜드마크로 건설되었습니다! =====")
+        else:
+            if map_bool:
+                match landing_num:
+                    case 1 | 2 | 3 | 4:
+                        print("===== " + custom_map_name[landing_num - 1] + " 도시는 이미 랜드마크 입니다! =====")
+                    case 6 | 7 | 8 | 9:
+                        print("===== " + custom_map_name[landing_num - 2] + " 도시는 이미 랜드마크 입니다! =====")
+                    case 11 | 12 | 13 | 14:
+                        print("===== " + custom_map_name[landing_num - 3] + " 도시는 이미 랜드마크 입니다! =====")
+                    case 16 | 17 | 18 | 19:
+                        print("===== " + custom_map_name[landing_num - 4] + " 도시는 이미 랜드마크 입니다! =====")
+            else:
+                print("===== " + default_map_name[landing_num] + " 도시는 이미 랜드마크 입니다! =====")
+
 
     time.sleep(1)
     
