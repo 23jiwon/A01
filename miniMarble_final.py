@@ -379,8 +379,8 @@ def login():
         time.sleep(3)
         return
         
-        print('게임에 참가할 인원수를 입력해주세요. 게임은 2~4인이 함께 즐길 수 있습니다.')
-        a = input('userID > ')
+    print('게임에 참가할 인원수를 입력해주세요. 게임은 2~4인이 함께 즐길 수 있습니다.')
+    a = input('userID > ')
     if a == 'back' or a == '뒤로가기' or a == 'b' or a == 'ㄷㄹㄱㄱ':
         return
     
