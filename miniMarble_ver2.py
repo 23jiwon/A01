@@ -25,6 +25,7 @@ sec = 15
 # 'map.txt'에서 불러온 배열
 global custom_map_txt
 global custom_map_name
+global ckcm
 
 # 5.2.2. 맵 배열
 global default_map_name
@@ -344,7 +345,8 @@ def login():
     global id_list
     global login_count
     global login_status
-    global custom_map_name    
+    global custom_map_name
+    global ckcm
     
     login_count = 0
     login_status = False
@@ -364,7 +366,6 @@ def login():
             print('입력이 올바르지 않습니다. 다시 입력해 주세요.')
             
     ckcm = check_custom_map()
-    print(custom_map_name)
     
     if ckcm == True:
         uc = unique_city(custom_map_name)
@@ -485,6 +486,8 @@ def login():
 #커스텀 맵
 def check_custom_map():
     global custom_map_name
+    reserved_number = ['0','1','2','3','4','5','6','7','8','9',
+                       '10','11','12','13','14','15','16','17','18','19']
     
     textfile = open("map.txt",'r', encoding='UTF8')
     custom_map_txt = textfile.read()
@@ -492,12 +495,21 @@ def check_custom_map():
     while '' in custom_map_name:
         del custom_map_name[custom_map_name.index('')]
 
+    for i in range(16):
+        strip_city_name = custom_map_name[i].lstrip()
+        strip_city_name = strip_city_name.rstrip()
+        custom_map_name[i] = strip_city_name
+        
     for city in custom_map_name:
-        if city in ['start', 'island', 'festival', 'airport']:
+        if city in ['start', 'island', 'festival', 'airport',
+                    '출발점','무인도','축제위원','공항']:
             print('[Error]:',city,'이 특수지역 명과 중복됩니다.')
             return False
         if len(city) < 1 or len(city) > 10:
             print('[Error]:',city,'이 길이 조건을 충족하지 않습니다.')
+            return False
+        if city in reserved_number:
+            print('[Error]:',city,'이 특수지역 번호와 중복됩니다.')
             return False
         for element in city:
             e = ord(element)
@@ -516,7 +528,6 @@ def check_custom_map():
             else:
                 print('[Error]:',element,'이 커스텀 맵 입력 조건에서 벗어납니다.')
                 return False
-    print(custom_map_name)
     return True
     
 #커스텀 맵 중복검사
@@ -856,18 +867,32 @@ def map_name_space():
     global now_festival
     global color_0
     global color_fes
-    for i in range(20):
-        print_map_name[i] = default_map_name[i]
-        if i == 0:
-            print_map_name[i] = '출발점'
-        elif i == 5:
-            print_map_name[i] = '무인도'
-        elif i == 10:
-            print_map_name[i] = '축제위원회'
-        elif i == 15:
-            print_map_name[i] = '공항'
+    global ckcm
+    
+    for i in range(16):
+        if ckcm == True:
+            dif = i//4 + 1
+            print_map_name[i+dif] = custom_map_name[i]
+        else:
+            print_map_name[i+dif] = default_map_name[i]
         
-        # 글자수 10칸으로 맞추기위해 공백 추가
+        #if i == 0:
+        #    print_map_name[i] = '출발점'
+        #elif i == 5:
+        #    print_map_name[i] = '무인도'
+        #elif i == 10:
+        #    print_map_name[i] = '축제위원회'
+        #elif i == 15:
+        #    print_map_name[i] = '공항'
+
+        print_map_name[0] = '출발점'
+        print_map_name[5] = '무인도'
+        print_map_name[10] = '축제위원회'
+        print_map_name[15] = '공항'
+
+
+    # 글자수 10칸으로 맞추기위해 공백 추가
+    for i in range(20):
         while len(print_map_name[i].encode('cp949')) < 10:
             print_map_name[i] += ' '
         if now_festival == i:
