@@ -1226,6 +1226,8 @@ def build(num):
             print("====== 건설을 포기합니다 ======")
     else:
         print("[Error]: 매입을 진행할 돈이 부족합니다. 매입을 포기합니다.")
+        
+    line_win(now_order) #확장 3. 라인독점
     time.sleep(1)
 
 def takeover(landing_num,landing_owner):
@@ -1256,6 +1258,7 @@ def takeover(landing_num,landing_owner):
         print("[Error]: 랜드마크는 인수할 수 없습니다.")
     else:
         print("[Error]: 인수를 진행할 돈이 부족합니다. 인수를 포기합니다.")
+    line_win(now_order) #확장 3. 라인독점
     time.sleep(1)
         
 def pay_fee(landing_num, all = 0):
