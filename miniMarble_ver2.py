@@ -1105,6 +1105,7 @@ def my_landMark(isto, landing_num):
     global now_order
     global trading_fee
     global custom_map_name
+    global default_map_name
     global map_bool
 
     if(isto == 1):
