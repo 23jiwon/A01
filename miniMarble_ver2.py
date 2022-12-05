@@ -682,10 +682,10 @@ def input_timer(left_time, require_msg):
             b_res = 0
             if re.search(' ' , player_input[0]) != None:
                 b_res = 1
-            if(player_input[0].isspace() or player_input[0]=='' and require_msg not in ['build', 'takeover']): 
+            if(player_input[0].isspace() or player_input[0]==''): 
                 # 입력에 공백만 있다면
                 print('[Error]: 인자의 개수가 적습니다. 1개의 인자를 입력해주세요.')
-            elif(b_res and require_msg not in ['festival', 'trip']):
+            elif(b_res and require_msg != 'sell'):
                 #문자열 사이에 공백이 있다면
                 print('[Error]: 인자의 개수가 많습니다. 1개의 인자를 입력해주세요.')
             if require_msg == 'roll':
