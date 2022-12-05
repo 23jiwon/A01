@@ -23,10 +23,13 @@ global sec
 sec = 15
 
 # 'map.txt'에서 불러온 배열
+global custom_map_txt
+global custom_map_name
 
 # 5.2.2. 맵 배열
 global default_map_name
 default_map_name = ['start', '타이베이', '베이징', '마닐라', '제주', 'island', '아테네', '코펜하겐', '오타와', '상파울로', 'festival', '프라하', '베를린', '모스크바', '제네바', 'airport', '런던', '파리', '뉴욕', '건국대']
+
 # 5.2.3.1. 기본 통행료 배열
 global default_fee
 default_fee = [0, 500, 500, 500, 500, 0, 1000, 1000, 1000, 1000, 0, 1500, 1500, 1500, 1500, 0, 2000, 2000, 2000, 2000]
@@ -144,6 +147,10 @@ salary = 2000
 # 로그파일명(기획서 6장)
 global map_file
 global turn_file
+
+# False면 default맵, True면 custom맵
+global map_bool
+map_bool = False
 
 # ============================================================================================================
 # 
@@ -342,9 +349,43 @@ def login():
     global id_list
     global login_count
     global login_status
+    global custom_map_name    
+    global map_bool
     
     login_count = 0
     login_status = False
+    
+    map_bool = False
+    
+    while(True):
+        print('기본 도시명 배열을 선택하려면 1, 커스텀 도시명 배열을 선택하려면 2를 입력해 주세요.')
+        a = input()
+        if a == '1':
+            map_bool = False
+            break
+        elif a == '2':
+            map_bool = True
+            break
+        else:
+            print('입력이 올바르지 않습니다. 다시 입력해 주세요.')
+    
+    if map_bool:
+        ckcm = check_custom_map()
+        print(custom_map_name)
+    
+        if ckcm == True:
+            uc = unique_city(custom_map_name)
+            if uc == True:
+                print('커스텀 맵이 정상적으로 적용되었습니다.')
+            else:
+                print('커스텀 맵이 올바르지 않습니다. 메인 메뉴로 돌아갑니다.')
+                time.sleep(3)
+                return
+        else:
+            print('커스텀 맵이 올바르지 않습니다. 메인 메뉴로 돌아갑니다.')
+            time.sleep(3)
+            return
+        
     print('게임에 참가할 인원수를 입력해주세요. 게임은 2~4인이 함께 즐길 수 있습니다.')
     a = input('userID > ')
     if a == 'back' or a == '뒤로가기' or a == 'b' or a == 'ㄷㄹㄱㄱ':
@@ -447,6 +488,56 @@ def login():
             id_info_list[i][1] = float("inf")
     login_status = True
     return
+
+#커스텀 맵
+def check_custom_map():
+    global custom_map_name
+    
+    textfile = open("map.txt",'r', encoding='UTF8')
+    custom_map_txt = textfile.read()
+    custom_map_name = custom_map_txt.split(',')
+    while '' in custom_map_name:
+        del custom_map_name[custom_map_name.index('')]
+
+    for city in custom_map_name:
+        if city in ['start', 'island', 'festival', 'airport']:
+            print('[Error]:',city,'이 특수지역 명과 중복됩니다.')
+            return False
+        if len(city) < 1 or len(city) > 10:
+            print('[Error]:',city,'이 길이 조건을 충족하지 않습니다.')
+            return False
+        for element in city:
+            e = ord(element)
+            if e >= 48 and e <= 57: #0~9 사이의 정수
+                continue
+            elif e >= 65 and e <= 90: #영어 대문자
+                continue
+            elif e >= 97 and e <= 122: #영어 소문자
+                continue
+            elif e >= 44032 and e <= 55203: #한글 조함
+                continue
+            elif e >= 12593 and e <= 12686: #한글 자모
+                continue
+            elif e == 32: #공백
+                continue
+            else:
+                print('[Error]:',element,'이 커스텀 맵 입력 조건에서 벗어납니다.')
+                return False
+    print(custom_map_name)
+    return True
+    
+#커스텀 맵 중복검사
+def unique_city(custom_map_name):
+    #global custom_map_name
+    if len(custom_map_name) != len(set(custom_map_name)):
+        print('[Error]: 중복되는 도시명이 있습니다.')
+        return False
+    elif len(custom_map_name)!=16:
+        print('[Error]: 도시명 개수가',16-len(custom_map_name),'개 부족합니다.')
+        return False
+    else:
+        return True
+    
 
 
 # ============================================================================================================
@@ -591,10 +682,10 @@ def input_timer(left_time, require_msg):
             b_res = 0
             if re.search(' ' , player_input[0]) != None:
                 b_res = 1
-            if(player_input[0].isspace() or player_input[0]=='' and require_msg not in ['build', 'takeover']): 
+            if(player_input[0].isspace() or player_input[0]==''): 
                 # 입력에 공백만 있다면
                 print('[Error]: 인자의 개수가 적습니다. 1개의 인자를 입력해주세요.')
-            elif(b_res and require_msg not in ['festival', 'trip']):
+            elif(b_res and require_msg != 'sell'):
                 #문자열 사이에 공백이 있다면
                 print('[Error]: 인자의 개수가 많습니다. 1개의 인자를 입력해주세요.')
             if require_msg == 'roll':
@@ -1007,6 +1098,66 @@ def landMark():
 
     time.sleep(1)
 
+# 다른 랜드마크 함수
+def my_landMark(isto, landing_num):
+    global landmark_list
+    global id_info_list
+    global now_order
+    global trading_fee
+    global custom_map_name
+    global default_map_name
+    global map_bool
+
+    if(isto == 1):
+        landmark_list[landing_num] = 1
+        id_info_list[now_order][2]+=trading_fee[landing_num]
+        if map_bool:
+            match landing_num:
+                case 1 | 2 | 3 | 4:
+                    print("===== " + custom_map_name[landing_num - 1] + " 도시가 랜드마크로 건설되었습니다! =====")
+                case 6 | 7 | 8 | 9:
+                    print("===== " + custom_map_name[landing_num - 2] + " 도시가 랜드마크로 건설되었습니다! =====")
+                case 11 | 12 | 13 | 14:
+                    print("===== " + custom_map_name[landing_num - 3] + " 도시가 랜드마크로 건설되었습니다! =====")
+                case 16 | 17 | 18 | 19:
+                    print("===== " + custom_map_name[landing_num - 4] + " 도시가 랜드마크로 건설되었습니다! =====")
+        else:
+            print("===== " + default_map_name[landing_num] + " 도시가 랜드마크로 건설되었습니다! =====")
+                
+    
+    elif(isto == 0):
+        if(landmark_list[landing_num]==0):
+            landmark_list[landing_num] = 1
+            id_info_list[now_order][2]+=trading_fee[landing_num]
+            if map_bool:
+                match landing_num:
+                    case 1 | 2 | 3 | 4:
+                        print("===== " + custom_map_name[landing_num - 1] + " 도시가 랜드마크로 건설되었습니다! =====")
+                    case 6 | 7 | 8 | 9:
+                        print("===== " + custom_map_name[landing_num - 2] + " 도시가 랜드마크로 건설되었습니다! =====")
+                    case 11 | 12 | 13 | 14:
+                        print("===== " + custom_map_name[landing_num - 3] + " 도시가 랜드마크로 건설되었습니다! =====")
+                    case 16 | 17 | 18 | 19:
+                        print("===== " + custom_map_name[landing_num - 4] + " 도시가 랜드마크로 건설되었습니다! =====")
+            else:
+                print("===== " + default_map_name[landing_num] + " 도시가 랜드마크로 건설되었습니다! =====")
+        else:
+            if map_bool:
+                match landing_num:
+                    case 1 | 2 | 3 | 4:
+                        print("===== " + custom_map_name[landing_num - 1] + " 도시는 이미 랜드마크 입니다! =====")
+                    case 6 | 7 | 8 | 9:
+                        print("===== " + custom_map_name[landing_num - 2] + " 도시는 이미 랜드마크 입니다! =====")
+                    case 11 | 12 | 13 | 14:
+                        print("===== " + custom_map_name[landing_num - 3] + " 도시는 이미 랜드마크 입니다! =====")
+                    case 16 | 17 | 18 | 19:
+                        print("===== " + custom_map_name[landing_num - 4] + " 도시는 이미 랜드마크 입니다! =====")
+            else:
+                print("===== " + default_map_name[landing_num] + " 도시는 이미 랜드마크 입니다! =====")
+
+
+    time.sleep(1)
+    
 # 무인도
 def island():
     global now_order
@@ -1075,6 +1226,8 @@ def build(num):
             print("====== 건설을 포기합니다 ======")
     else:
         print("[Error]: 매입을 진행할 돈이 부족합니다. 매입을 포기합니다.")
+        
+    line_win(now_order) #확장 3. 라인독점
     time.sleep(1)
 
 def takeover(landing_num,landing_owner):
@@ -1096,6 +1249,8 @@ def takeover(landing_num,landing_owner):
             # 인수 진행 액션 코드
             owner_list[landing_num] = id_info_list[now_order][0]
             id_info_list[now_order][2] += trading_fee[landing_num]
+            my_landMark(1, landing_num)
+            
         elif takeover_flag == 3:
             print("====== 인수를 포기합니다 ======")
             # 건설 포기 액션 코드
@@ -1103,6 +1258,7 @@ def takeover(landing_num,landing_owner):
         print("[Error]: 랜드마크는 인수할 수 없습니다.")
     else:
         print("[Error]: 인수를 진행할 돈이 부족합니다. 인수를 포기합니다.")
+    line_win(now_order) #확장 3. 라인독점
     time.sleep(1)
         
 def pay_fee(landing_num, all = 0):
@@ -1219,6 +1375,7 @@ def action(landing_num):
                 bankruptcy()                
 
         elif owner_list[landing_num] == id_info_list[now_order][0]:
+            my_landMark(0, landing_num)
             #print('===== 내 도시라 편안해요~ =====')
             time.sleep(1)
             
@@ -1406,7 +1563,10 @@ def isSuccess():
     id_count = 0 #이긴 사람 아이디 번호 저장용
     global money_list
     money_list = []
-    if now_turn > 10:
+    
+    if line_win(now_order): # 라인 독점한 경우 즉시 승리
+        return True
+    elif now_turn > 10:
         now_turn = 10
         for i in range(login_count):
             if id_info_list[i][3] == 2:
@@ -1570,6 +1730,49 @@ def write_log_file_trip(start, end): #여행할 경우 log 기록
     f2.write(str(now_turn)+", "+str(now_order)+", "+str(id_info_list[now_order][2])+", "+str(is_double)+", "+str(start)+", "+str(end)+"\n")
     f2.close()
 
+# 라인 독점 함수 -> build, takeover에서 호출
+def line_win(now_order):
+    global rank_list
+    global owner_list
+    global id_info_list
+    global money_list
+    global rank_money_list
+    global now_turn
+    
+    if (id_info_list[now_order][0] == owner_list[1] == owner_list[2] == owner_list[3] == owner_list[4]) or \
+    (id_info_list[now_order][0] == owner_list[6] == owner_list[7] == owner_list[8] == owner_list[9]) or \
+    (id_info_list[now_order][0] == owner_list[11] == owner_list[12] == owner_list[13] == owner_list[14]) or \
+    (id_info_list[now_order][0] == owner_list[16] == owner_list[17] == owner_list[18] == owner_list[19]):
+        
+        print("라인 독점 성공")
+        time.sleep(3)
+        for i in range(login_count):
+            if id_info_list[i][3] == 2:
+                money_list.append(float("inf"))
+            else:
+                money_list.append(id_info_list[i][2])
+                
+        check_id_num = 0 # 추가 수정
+        
+        for j in range(login_count - money_list.count(float("inf"))):
+            check_id_num = money_list.index(min(money_list))
+            rank_list.append(id_info_list[check_id_num][0])
+            rank_money_list.append(id_info_list[check_id_num][2])
+            money_list[check_id_num] = float("inf")            
+                
+        draw_basic_map()
+        
+        print('게임을 종료합니다.')
+        print('===== 최종 결과 ======')
+       
+        print_rank()
+        
+        return True
+    
+    else:
+        #print("라인 독점 실패")
+        return False    
+    
 def main():
     global now_order
     global now_turn
