@@ -347,37 +347,40 @@ def login():
     global login_status
     global custom_map_name
     global ckcm
+    global default_map_name
     
     login_count = 0
     login_status = False
     map_bool = False
+    ckcm = False
 
     while(True):
         print('기본 도시명 배열을 선택하려면 1 혹은 기본, 커스텀 도시명 배열을 선택하려면 2 혹은 커스텀을 입력해 주세요.')
         a = input()
-        if a == '1' or a =='기본':
+        if a == '1':
             map_bool = True
             break
-        elif a == '2' or a == '커스텀':
+        elif a == '2':
             map_bool = False
+            ckcm = check_custom_map()
+            if ckcm == True:
+                uc = unique_city(custom_map_name)
+                if uc == True:
+                    print('커스텀 맵이 정상적으로 적용되었습니다.')
+                    default_map_name = custom_map_name
+                else:
+                    print('커스텀 맵이 올바르지 않습니다. 메인 메뉴로 돌아갑니다.')
+                    time.sleep(3)
+                    return
+            else:
+                print('커스텀 맵이 올바르지 않습니다. 메인 메뉴로 돌아갑니다.')
+                time.sleep(3)
+                return
             break
         else:
             print('입력이 올바르지 않습니다. 다시 입력해 주세요.')
 
-    ckcm = check_custom_map()
 
-    if ckcm == True:
-        uc = unique_city(custom_map_name)
-        if uc == True:
-            print('커스텀 맵이 정상적으로 적용되었습니다.')
-        else:
-            print('커스텀 맵이 올바르지 않습니다. 메인 메뉴로 돌아갑니다.')
-            time.sleep(3)
-            return
-    else:
-        print('커스텀 맵이 올바르지 않습니다. 메인 메뉴로 돌아갑니다.')
-        time.sleep(3)
-        return
     
     print('게임에 참가할 인원수를 입력해주세요. 게임은 2~4인이 함께 즐길 수 있습니다.')
     a = input('userID > ')
@@ -489,7 +492,7 @@ def check_custom_map():
                        '10','11','12','13','14','15','16','17','18','19']
 
     textfile = open("map.txt",'r', encoding='UTF8')
-    custom_map_txt = textfile.read()
+    custom_map_txt = textfile.readline()
     custom_map_name = custom_map_txt.split(',')
     while '' in custom_map_name:
         del custom_map_name[custom_map_name.index('')]
@@ -865,12 +868,12 @@ def map_name_space():
     global now_festival
     global color_0
     global color_fes
+    global ckcm
+    
     for i in range(16):
-        if ckcm == True:
-            dif = i//4 + 1
-            print_map_name[i+dif] = custom_map_name[i]
-        else:
-            print_map_name[i+dif] = default_map_name[i]
+        dif = i//4 + 1
+        
+        print_map_name[i+dif] = default_map_name[i]
 
         #if i == 0:
         #    print_map_name[i] = '출발점'
@@ -887,7 +890,9 @@ def map_name_space():
         print_map_name[15] = '공항'
 
 
-         # 글자수 10칸으로 맞추기위해 공백 추가
+    # 글자수 10칸으로 맞추기위해 공백 추가
+    for i in range(20):
+        
         while len(print_map_name[i].encode('cp949')) < 10:
             print_map_name[i] += ' '
         if now_festival == i:
@@ -1765,7 +1770,7 @@ def main():
 
                 sec = 10
                 draw_basic_map()
-                rollDice()
+                custom_rollDice()
                 write_map_file()
                 
                 
