@@ -1114,13 +1114,14 @@ def my_landMark(isto, landing_num):
     if(isto == 1):
         landmark_list[landing_num] = 1
         id_info_list[now_order][2]+=trading_fee[landing_num]
-    
+        print("===== " + default_map_name[landing_num] + " 도시가 랜드마크로 건설되었습니다! =====")
     elif(isto == 0):
         if(landmark_list[landing_num]==0):
             landmark_list[landing_num] = 1
             id_info_list[now_order][2]+=trading_fee[landing_num]
+            print("===== " + default_map_name[landing_num] + " 도시가 랜드마크로 건설되었습니다! =====")
         else:
-            print('이미 랜드마크!')
+            print("===== " + default_map_name[landing_num] + " 도시는 이미 랜드마크 입니다! =====")
 
     time.sleep(1)
     
