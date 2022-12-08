@@ -799,6 +799,8 @@ def input_timer(left_time, require_msg):
             if player_input[0] != None:
                 player_input = [None]
                 break
+        if require_msg == 'trip':
+            return None
         return False
     return False
 
@@ -1164,7 +1166,7 @@ def trip():
     print('>> trip?')
     landing_num = input_timer(15, 'trip')
     draw_basic_map()
-    if landing_num != 15 and landing_num != False:
+    if landing_num != 15 and landing_num != None:
         write_log_file_trip(15, landing_num)
         action(landing_num)
         
