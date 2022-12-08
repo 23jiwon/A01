@@ -142,7 +142,7 @@ global rank_money_list
 rank_money_list = []
 
 global salary
-salary = 5000
+salary = 2000
 
 # 로그파일명(기획서 6장)
 global map_file
@@ -1164,7 +1164,7 @@ def trip():
     print('>> trip?')
     landing_num = input_timer(15, 'trip')
     draw_basic_map()
-    if landing_num != 15:
+    if landing_num != 15 and landing_num != False:
         write_log_file_trip(15, landing_num)
         action(landing_num)
         
