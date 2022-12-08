@@ -374,8 +374,6 @@ def login():
                     default_map_name.insert(5, '무인도')
                     default_map_name.insert(10, '축제위원회')
                     default_map_name.insert(15, '공항')
-                    print('커스텀 맵이 정상적으로 적용되었습니다.')
-                    default_map_name = custom_map_name
                 else:
                     print('커스텀 맵이 올바르지 않습니다. 메인 메뉴로 돌아갑니다.')
                     time.sleep(3)
@@ -878,29 +876,11 @@ def map_name_space():
     global color_fes
     global ckcm
     
-    for i in range(16):
-        dif = i//4 + 1
-        
-        print_map_name[i+dif] = default_map_name[i]
-
-        #if i == 0:
-        #    print_map_name[i] = '출발점'
-        #elif i == 5:
-        #    print_map_name[i] = '무인도'
-        #elif i == 10:
-        #    print_map_name[i] = '축제위원회'
-        #elif i == 15:
-        #    print_map_name[i] = '공항'
-
-        print_map_name[0] = '출발점'
-        print_map_name[5] = '무인도'
-        print_map_name[10] = '축제위원회'
-        print_map_name[15] = '공항'
-
+    for i in range(20):
+        print_map_name[i] = default_map_name[i]
 
     # 글자수 10칸으로 맞추기위해 공백 추가
-    for i in range(20):
-        
+    for i in range(20):        
         while len(print_map_name[i].encode('cp949')) < 10:
             print_map_name[i] += ' '
         if now_festival == i:
@@ -1778,7 +1758,7 @@ def main():
 
                 sec = 10
                 draw_basic_map()
-                custom_rollDice()
+                rollDice()
                 write_map_file()
                 
                 
