@@ -368,13 +368,14 @@ def login():
                 uc = unique_city(custom_map_name)
                 if uc == True:
                     print('커스텀 맵이 정상적으로 적용되었습니다')
-                    
                     for i in range(16):                      
                         default_map_name.append(custom_map_name[i])
                     default_map_name.insert(0, '출발점')
                     default_map_name.insert(5, '무인도')
                     default_map_name.insert(10, '축제위원회')
                     default_map_name.insert(15, '공항')
+                    print('커스텀 맵이 정상적으로 적용되었습니다.')
+                    default_map_name = custom_map_name
                 else:
                     print('커스텀 맵이 올바르지 않습니다. 메인 메뉴로 돌아갑니다.')
                     time.sleep(3)

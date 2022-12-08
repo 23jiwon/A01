@@ -141,6 +141,10 @@ rank_money_list = []
 global salary
 salary = 10000
 
+# 로그파일명(기획서 6장)
+global map_file
+global turn_file
+
 # ============================================================================================================
 # 
 #                              게임 시작 부분 / 회원가입 / 로그인 / 그만두기
@@ -189,6 +193,8 @@ def menu():
                 
                 print()
                 print('====== 게임을 시작합니다 ======')
+                make_log_file() #로그파일 생성
+            
                 # 여기서부터 게임 파트
         else:
             print('[Error]: 명령어가 올바르지 않습니다. 다시 입력해 주세요.')
@@ -211,53 +217,61 @@ def register():
     
     while select_status == False:
         a = input("userID > ")
-        b = a.split()
-        if b[0] == 'id' or b[0] == '아이디' or b[0] == 'i' or b[0] == '아디': 
-            if len(b) >= 2:
-                userid = input_id(b[1])
+        if a != '':
+            b = a.split()
+            if b[0] == 'id' or b[0] == '아이디' or b[0] == 'i' or b[0] == '아디': 
+                if len(b) == 2: ##1023 
+                    userid = input_id(b[1])
+                else:
+                    print('[Error]: 회원가입 id 입력 조건에서 벗어납니다. 다시 id를 입력해 주세요.')
+                    continue
+                if userid == '0':
+                    id_status = False
+                else:
+                    id_status = True
+                    print('아이디가 정상 입력되었습니다')
+                    print('현재 아이디: ' + userid)
+                    
+            elif b[0] == 'pw' or b[0] == '비밀번호' or b[0] == 'p' or b[0] =='비번':
+                if len(b) >= 2:
+                    userpw = input_pw(b[1])
+                else:
+                    print('[Error]: 회원가입 pw 입력 조건에서 벗어납니다. 다시 pw를 입력해 주세요.')
+                    continue
+                if userpw == '0':
+                    pw_status = False
+                else:
+                    pw_status = True
+                    print('비밀번호가 정상 입력되었습니다')
+                    print('현재 비밀번호: ' + userpw)
+            elif b[0] == 'select':
+                if len(b) == 1:
+                    if id_status == True and pw_status == True:
+                        f = open('member.txt', 'a', encoding = 'utf-8')
+                        f.write(' ' + userid + ' ' + userpw + '\n')
+                        f.close()
+                        print('====== id: ' + userid + ' pw: ' + userpw + ' 회원가입 완료 ======')
+                        print()
+                        return
+                    else:
+                        print('[Error]: 아이디와 비밀번호를 정상적으로 입력 후 다시 입력해 주세요')
+                else: 
+                    print('[Error]: 불필요한 인자가 입력되었습니다. 다시 입력해 주세요.')    
+                    
+            elif b[0] == 'back' or b[0] == '뒤로가기' or b[0] == 'b' or b[0] == 'ㄷㄹㄱㄱ':
+                if len(b) == 1:
+                    return
+                else: 
+                    print('[Error]: 불필요한 인자가 입력되었습니다. 다시 입력해 주세요.')
             else:
-                print('[Error]: 회원가입 id 입력 조건에서 벗어납니다. 다시 id를 입력해 주세요.')
-                continue
-            if userid == '0':
-                id_status = False
-            else:
-                id_status = True
-                print('아이디가 정상 입력되었습니다')
-                print('현재 아이디: ' + userid)
+                print('[Error]: 명령어를 잘못 입력하셨습니다. 다시 입력해 주세요.')
                 
-        elif b[0] == 'pw' or b[0] == '비밀번호' or b[0] == 'p' or b[0] =='비번':
-            if len(b) >= 2:
-                userpw = input_pw(b[1])
-            else:
-                print('[Error]: 회원가입 pw 입력 조건에서 벗어납니다. 다시 pw를 입력해 주세요.')
-                continue
-            if userpw == '0':
-                pw_status = False
-            else:
-                pw_status = True
-                print('비밀번호가 정상 입력되었습니다')
-                print('현재 비밀번호: ' + userpw)
-                
-        elif b[0] == 'select':
-            if id_status == True and pw_status == True:
-                f = open('member.txt', 'a', encoding = 'utf-8')
-                f.write(' ' + userid + ' ' + userpw + '\n')
-                f.close()
-                print('====== id: ' + userid + ' pw: ' + userpw + ' 회원가입 완료 ======')
-                print()
-                return
-            else:
-                print('[Error]: 아이디와 비밀번호를 정상적으로 입력 후 다시 select를 입력해 주세요')
-                
-        elif b[0] == 'back' or b[0] == '뒤로가기' or b[0] == 'b' or b[0] == 'ㄷㄹㄱㄱ':
-            return
+            if id_status == True and pw_status == True and (b[0] == 'id' or b[0] == 'pw'):
+                print('아이디와 비밀번호가 정상적으로 입력되었습니다')
+                print('이대로 결정하시려면 select를 입력해 주세요')
+                print('만약 아이디와 비밀번호를 변경하고 싶다면 다시 id, pw 명령어를 사용해 주세요')
         else:
-            print('[Error]: 명령어를 잘못 입력하셨습니다. 다시 입력해 주세요.')
-            
-        if id_status == True and pw_status == True and (b[0] == 'id' or b[0] == 'pw'):
-            print('아이디와 비밀번호가 정상적으로 입력되었습니다')
-            print('이대로 결정하시려면 select를 입력해 주세요')
-            print('만약 아이디와 비밀번호를 변경하고 싶다면 다시 id, pw 명령어를 사용해 주세요')
+            print('[Error] 잘못된 입력입니다. 다시 입력해 주세요.')
 
     
         
@@ -276,7 +290,7 @@ def input_id(i):
                 print('[Error]: 회원가입 id 입력 조건에서 벗어납니다. 다시 id를 입력해 주세요.')
                 return '0'
     else:
-        print('[Error]: 회원가입 id 입력 조건에서 벗어납니다. id 길이가 짧습니다. 다시 id를 입력해 주세요.')
+        print('[Error]: 회원가입 id 입력 조건에서 벗어납니다. 다시 id를 입력해 주세요.')
         return '0'
     
     with open('member.txt') as file:
@@ -335,15 +349,18 @@ def login():
     a = input('userID > ')
     if a == 'back' or a == '뒤로가기' or a == 'b' or a == 'ㄷㄹㄱㄱ':
         return
-    z = a[0]
+    
+    if a !='':
+        z = a[0]
     
     while not (len(a) == 1 and ord(z) >= 50 and ord(z) <= 52):
         print('[Error]: 인자에 숫자 이외의 글자 혹은 2~4를 제외한 숫자를 입력했습니다. 숫자를 입력해주세요.')
         print()
         print('게임에 참가할 인원수를 입력해주세요.')
         a = input('userID > ')
-        z = a[0]
-
+        if a !='':
+            z = a[0]
+    
     print(a + '명의 id와 pw를 입력받습니다. (입력형식: login <아이디> <비밀번호>)')
 
     while True:
@@ -423,6 +440,11 @@ def login():
     id_3_info = [id_3,10000,10000,0]
     id_4_info = [id_4,10000,10000,0]
     id_info_list = [id_1_info,id_2_info,id_3_info,id_4_info]
+    for i in range(4):
+        if login_count-1 < i:
+            id_info_list[i][3] = 2
+            id_info_list[i][2] = float("inf")
+            id_info_list[i][1] = float("inf")
     login_status = True
     return
 
@@ -471,7 +493,7 @@ def judge_own_city_name(city_name):
     global player_input
     try:
         city_num = int(city_name)
-        if city_num <= 0 or city_num > 20 or city_num == 5 or city_num == 10 or city_num == 15 or float(city_name) - city_num != 0:
+        if city_num <= 0 or city_num >= 20 or city_num == 5 or city_num == 10 or city_num == 15 or float(city_name) - city_num != 0:
             print('[Error]: 유효하지 않은 도시번호입니다. 특수지역을 제외한 0이상 19이하의 정수를 입력해주세요.')
             player_input=[None]
             return False
@@ -485,6 +507,8 @@ def judge_own_city_name(city_name):
         for i in range(20):
             if city_name == default_map_name[i]:
                 if owner_list[i] != id_list[now_order]: 
+                    print('===== ' + default_map_name[i] + ' 도시를 보유하고 있지 않습니다! =====')
+                    player_input=[None]
                     return False
                 else:
                     return i
@@ -507,7 +531,7 @@ def judge_city_name(city_name):
     global player_input
     try:
         city_num = int(city_name)
-        if city_num < 0 or city_num > 20 or float(city_name) - city_num != 0:
+        if city_num < 0 or city_num >= 20 or float(city_name) - city_num != 0:
             print('[Error]: 유효하지 않은 도시번호입니다. 0이상 19이하의 정수를 입력해주세요.')
             player_input=[None]
             return False
@@ -603,14 +627,14 @@ def input_timer(left_time, require_msg):
                     if city_num == -1:
                         city_num = 0
                     print('===== ' + print_map_name[city_num].rstrip()  + '(으)로 이동합니다. =====')
-                    if city_num < 15:
+                    if city_num < 15 and city_num != 0:
                         # 월급지급
                         print('===== 월급을 수령했습니다. =====')
                         id_info_list[now_order][1] += salary
                         id_info_list[now_order][2] += salary
 
                     player_end_location[now_order] = city_num                    
-                    # 활동로그 기록
+                    #write_log_file()
                     player_start_location[now_order] = player_end_location[now_order]
                     time.sleep(1)
                     return city_num
@@ -992,7 +1016,7 @@ def island():
     islandPlayer[now_order] = 1
     if is_double == 3:
         player_end_location[now_order] = 5
-        # 활동로그파일 기록
+        write_log_file()
         player_start_location[now_order] = player_end_location[now_order]
     is_double = 0
 
@@ -1018,12 +1042,12 @@ def festival():
         return
         
 # 공항 함수
-def trip():        
+def trip():
     print('>> trip?')
     landing_num = input_timer(15, 'trip')
     draw_basic_map()
     if landing_num != 15:
-
+        write_log_file_trip(15, landing_num)
         action(landing_num)
         
 
@@ -1221,7 +1245,7 @@ def player_move(Dice):
         print('===== 월급을 수령했습니다. =====')
         id_info_list[now_order][1] += salary
         id_info_list[now_order][2] += salary
-    # 활동로그파일 기록
+    write_log_file()
     player_start_location[now_order] = player_end_location[now_order]
     sec = 15
     time.sleep(1)
@@ -1381,26 +1405,23 @@ def isSuccess():
     global rank_money_list
     id_count = 0 #이긴 사람 아이디 번호 저장용
     global money_list
-    money_list = [0, 0, 0, 0]
+    money_list = []
     if now_turn > 10:
-        print('게임을 종료합니다')
+        now_turn = 10
         for i in range(login_count):
-            money_list[i] = id_info_list[i][2]
             if id_info_list[i][3] == 2:
-                money_list[i] = -1
+                money_list.append(float("inf"))
+            else:
+                money_list.append(id_info_list[i][2])
         id_success_num = 0
-        for j in range(login_count - money_list.count(-1) + 1):
-            min_money = float("inf")
-            id_count = 0
-            for i in money_list:            
-                if min_money >= i and i != -1: 
-                    min_money = i
-                    id_success_num = id_count                
-                id_count += 1
+        print(money_list)
+        for j in range(login_count - money_list.count(float("inf"))):
+            id_success_num = money_list.index(min(money_list))
             rank_list.append(id_info_list[id_success_num][0])
             rank_money_list.append(id_info_list[id_success_num][2])
-            money_list[id_success_num] = -1            
+            money_list[id_success_num] = float("inf")            
         draw_basic_map()
+        print('게임을 종료합니다.')
         print('===== 최종 결과 ======')
         print_rank()
         return True
@@ -1410,8 +1431,9 @@ def isSuccess():
         for i in range(login_count):
             if id_info_list[i][3] == 2:
                 bankruptcy_count += 1
-        draw_basic_map()
-        if bankruptcy_count == login_count - 1:# 자길 제외하고 다 파산하면 승리
+        if bankruptcy_count == login_count - 1:# 자길 제외하고 다 파산하면 승리 
+            draw_basic_map()
+            print('게임을 종료합니다.')
             print('===== 최종 결과 ======')
             rank_list.append(id_info_list[now_order][0])
             rank_money_list.append(id_info_list[now_order][2])
@@ -1433,6 +1455,121 @@ id_4_info = [id_4,1000,1000,0]
 id_info_list = [id_1_info,id_2_info,id_3_info,id_4_info]
 login_status = True    
 '''
+
+# 로그파일 생성 함수. 게임 시작 시 한번 만 호출
+def make_log_file():
+    #### 맵 파일
+    global map_file
+    map_file = "log-"+str(id_1)+"-map.txt"
+
+    #파일명 중복 검사
+    #input_path = str(os.path.realpath('')) + "\\"
+    filename = "log-"+id_1+"-map"
+    file_ext = ".txt"
+    #print("input_path : " + str(input_path))
+    
+    output_path = str(os.path.realpath('')) + "\\%s%s"
+    output_path = output_path %(filename, file_ext)
+    #print("output_path : " + str(output_path))
+
+    uniq=1
+    while os.path.exists(output_path):
+        output_path = str(os.path.realpath('')) + "\\{name}({num}){ext}"
+        output_path = output_path.format(name = filename, num= uniq, ext = file_ext)
+        map_file = "log-" + str(id_1) + "-map(" + str(uniq) + ").txt"
+        #print("output_path : "+ str(output_path))
+
+        uniq += 1
+        
+        
+    #### 활동로그 파일
+    global turn_file
+    turn_file = "log-"+str(id_1)+"-turn.txt"
+    
+    #파일명 중복 검사
+    filename = "log-"+id_1+"-turn"
+    file_ext = ".txt"
+    
+    output_path = str(os.path.realpath('')) + "\\%s%s"
+    output_path = output_path %(filename, file_ext)
+    #print("output_path : " + str(output_path))
+
+    uniq=1
+    while os.path.exists(output_path):
+        output_path = str(os.path.realpath('')) + "\\{name}({num}){ext}"
+        output_path = output_path.format(name = filename, num= uniq, ext = file_ext)
+        turn_file = "log-" + str(id_1) + "-turn(" + str(uniq) + ").txt"
+        #print("output_path : "+ str(output_path))
+
+        uniq += 1
+
+    f = open(map_file, 'w', encoding = 'utf-8')
+    f.write("")
+    f.close()
+    
+    f2 = open(turn_file, 'w', encoding = 'utf-8')
+    f2.write("턴 수, 플레이어 번호, 플레이어의 전 재산, 현재 턴의 더블 횟수, 출발지 번호, 도착지 번호\n")
+    f2.close()
+
+
+# 로그파일 작성 함수. 한 차례가 끝날때마다 호출
+def write_map_file():
+    
+    #### 로그
+    global map_file
+    f = open(map_file, 'w', encoding = 'utf-8')
+    
+    # 6.1.1 플레이어 수
+    f.write("the number of players : " + str(login_count)+"\n")
+    
+    # 6.1.2 플레이어 정보
+    for i in range(login_count):
+        player_id = id_info_list[i][0]
+        player_cash =id_info_list[i][1]
+        player_property=id_info_list[i][2]
+        player_status=id_info_list[i][3]
+        globals()['player_info_{}'.format(i+1)] = [player_id, player_cash, player_property, player_status] # 아이디, 현금, 전재산, 현재상태
+        # TODO : 상태 변경 추가해야함
+        # if -> player_info_n[3] = 1
+        f.write(str(id_info_list[i]))
+
+    # 6.1.3 페스티벌 변수
+    global now_festival
+    f.write("\nfestival : "+ str(now_festival))
+    
+    #6.1.4 소유주 문자열 배열
+    global owner_list
+    
+    f.write("\nowner_list : "+ str(owner_list))
+    
+    #6.1.5 랜드마크 문자열 배열
+    global landmark_list
+    
+    f.write("\nlandmark_list : "+ str(landmark_list))
+    
+    f.close()
+    
+    #### 활동로그
+#     global turn_file
+#     f2 = open(turn_file, 'a', encoding = 'utf-8')
+    
+#     f2.write(str(now_turn)+", "+str(now_order)+", "+str(id_info_list[now_order][2])+", "+str(is_double)+", "+str(player_start_location[now_order])+", "+str(player_end_location[now_order])+"\n")
+#     f2.close()
+
+def write_log_file(): #더블 시 
+    global turn_file
+    f2 = open(turn_file, 'a', encoding = 'utf-8')
+    
+    f2.write(str(now_turn)+", "+str(now_order)+", "+str(id_info_list[now_order][2])+", "+str(is_double)+", "+str(player_start_location[now_order])+", "+str(player_end_location[now_order])+"\n")
+    f2.close()
+
+def write_log_file_trip(start, end): #여행할 경우 log 기록
+    global turn_file
+    f2 = open(turn_file, 'a', encoding = 'utf-8')
+    
+    f2.write(str(now_turn)+", "+str(now_order)+", "+str(id_info_list[now_order][2])+", "+str(is_double)+", "+str(start)+", "+str(end)+"\n")
+    f2.close()
+
 def main():
     global now_order
     global now_turn
@@ -1456,7 +1593,7 @@ def main():
                 sec = 10
                 draw_basic_map()
                 rollDice()
-                
+                write_map_file()
                 
                 
                 #해당 플레이어의 차례 종료
