@@ -29,7 +29,7 @@ global ckcm
 
 # 5.2.2. 맵 배열
 global default_map_name
-default_map_name = ['타이베이', '베이징', '마닐라', '제주', '아테네', '코펜하겐', '오타와', '상파울로', '프라하', '베를린', '모스크바', '제네바', '런던', '파리', '뉴욕', '건국대']
+default_map_name =  []
 # 5.2.3.1. 기본 통행료 배열
 global default_fee
 default_fee = [0, 500, 500, 500, 500, 0, 1000, 1000, 1000, 1000, 0, 1500, 1500, 1500, 1500, 0, 2000, 2000, 2000, 2000]
@@ -358,7 +358,8 @@ def login():
         print('기본 도시명 배열을 선택하려면 1 혹은 기본, 커스텀 도시명 배열을 선택하려면 2 혹은 커스텀을 입력해 주세요.')
         a = input()
         if a == '1':
-            map_bool = True
+            map_bool = True            
+            default_map_name = ['출발점', '타이베이', '베이징', '마닐라', '제주', '무인도', '아테네', '코펜하겐', '오타와', '상파울로', '축제위원회', '프라하', '베를린', '모스크바', '제네바', '공항', '런던', '파리', '뉴욕', '건국대']
             break
         elif a == '2':
             map_bool = False
@@ -366,6 +367,13 @@ def login():
             if ckcm == True:
                 uc = unique_city(custom_map_name)
                 if uc == True:
+                    print('커스텀 맵이 정상적으로 적용되었습니다')
+                    for i in range(16):                      
+                        default_map_name.append(custom_map_name[i])
+                    default_map_name.insert(0, '출발점')
+                    default_map_name.insert(5, '무인도')
+                    default_map_name.insert(10, '축제위원회')
+                    default_map_name.insert(15, '공항')
                     print('커스텀 맵이 정상적으로 적용되었습니다.')
                     default_map_name = custom_map_name
                 else:
